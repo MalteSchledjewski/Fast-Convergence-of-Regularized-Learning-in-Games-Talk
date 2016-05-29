@@ -27,21 +27,125 @@
 \institute{Saarbrücken Graduate School of Computer Science}
 \date{2016}
 
-\usetheme{Madrid}
+\usetheme{Darmstadt}
 
 \begin{document}
+	
 \frame{\titlepage}
 
 \section{Motivation}
-% paper: title, authors,...
-% Intuition of stablizing the system
+
+\begin{frame}
+	\frametitle{The paper}
+	\begin{block}{Fast Convergence of Regularized Learning in Games}
+		\begin{itemize}
+			\item Vasilis Syrgkanis, Microsoft Research
+			\item Alekh Agarwal, Microsoft Research
+			\item Haipeng Luo, Princeton University
+			\item Robert E. Schapire, Microsoft Research
+		\end{itemize}
+		published 2015
+	\end{block}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Basic intuition}
+    If players are
+		\begin{itemize}
+			\item smart,
+			\item selfish and
+			\item acting independently
+		\end{itemize}
+		
+	we expect
+	\begin{itemize}
+		\item the dynamics to stabilize and
+		\item the utilities to approach a maximum (individually and as a group).
+	\end{itemize}
+\end{frame}
+
+
+
 
 \section{Games}
 %regret
 
+\begin{frame}
+	\frametitle{The setting}
+	\begin{block}{A single game G}
+	\begin{itemize}
+		\item A static game $G$ of $n$ players.
+		\item For each player $i$:
+		\begin{itemize}
+			\item finite strategy space $S_i$ with cardinality $d$
+			\item utility function $u_i : S_1 \times \ldots \times S_n \rightarrow [0,1]$
+		\end{itemize} \pause
+		\item $ w = (w_1 , \ldots, w_n)$, a profile of mixed strategies with
+		\begin{itemize}
+			\item $w_i \in \Delta(S_i)$
+			\item $w_{i,x}$ is the probability of strategy $x \in S_i$
+		\end{itemize}
+		\item  $U_i(w) = \mathbb{E}_{s\sim{}w}[u_i(s)]$, the expected utility of player $i$
+	\end{itemize}
+	\end{block}
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{The setting}
+	The game G is repeatedly played for T time steps.\\
+	For each time step:
+	\begin{itemize}
+		\item Each player $i$ picks a mixed strategy $\mathbf{w}^t_i \in \Delta(S_i)$ 
+		\item Each player observes the expected utility for each strategy $x$: $\mathbf{u}^t_i = (u^t_{i,x})_{x \in S_i} $ with $ u^t_{i,x} = \mathbb{E}_{s_{-i} \sim w^t_{-i}} \left[u_i(x,s_{-i})\right] $
+	\end{itemize}
+	
+	The expected utility for a player $i$ in iteration $t$ is therefore 
+	$ \left\langle w^t_{i},u^t_{i}\right\rangle $.
+	
+	\begin{block}{Regret}
+		\begin{equation*}
+			r_i(T) = \sup\limits_{\mathbf{w}^*_i \in \Delta (S_i)} \sum_{t=1}^{T} \left< \mathbf{w}^*_i - \mathbf{w}^t_i, \mathbf{u}^t_i \right>
+		\end{equation*}
+	
+	\end{block}
+	
+\end{frame}
+
+\begin{frame}
+	\frametitle{No-regret}
+	Assume all players chose $\mathbf{w}^t_i$ based on a no-regret algorithm.
+	
+	Suitable because:
+	\begin{itemize}
+		\item regret-bounds hold against adversarial environments
+		\item each player's utility approaches optimality
+		\item when played against each other
+		\begin{itemize}
+			\item the social welfare reaches an approximate optimum
+			\item the strategies converge to an equilibrium based with rates based on the regret bounds
+		\end{itemize} 
+		\item there are well-known families of no-regret algorithms, for which the average regret vanishes at the worst-case rate of $O(1/\sqrt{T})$, which is unimprovable against fully adversarial environments.
+	\end{itemize}
+\end{frame}
 
 \section{Contributions}
-% we only focus on Scoual Welfare
+% we only focus on Social Welfare
+% previous O
+
+\begin{frame}
+	\frametitle{Contributions}
+
+	\begin{itemize}
+		\item\alert<2>{ The average welfare converges to approximate optimum at the rate $O(1/T)$ instead of $O(1/\sqrt{T})$.}
+		\item The average welfare is at least $ (\lambda / (1 + \mu)) \text{OPT} - O(1/T) $.
+		\item Each player's average regret converges to zero at rate $O(T^{-3/4})$.
+		\item The black-box reduction preserves the rate in favourable environments and maintains $\tilde{O}(1/\sqrt{T})$ against adversarial environments.
+	\end{itemize}
+\end{frame}
+
+
+
 
 \section{A special class of no-regret dynamics}
 \subsection{RVU property}
