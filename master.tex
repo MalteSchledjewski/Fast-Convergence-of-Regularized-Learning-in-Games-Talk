@@ -1,0 +1,64 @@
+\documentclass{beamer}
+\usepackage[british]{babel}        % for german language
+\usepackage[utf8]{inputenc}        % for umlauts and other non 7bit ascii things
+\usepackage[T1]{fontenc}           % this is needed for correct output of umlauts in pdf
+\usepackage{lmodern}               % use a vector based font, not a bitmap based font for T1
+\usepackage[stretch=10]{microtype} % improves font placements
+\usepackage[autostyle=true,german=quotes]{csquotes}
+
+%\usepackage[backend=biber,style=numeric]{biblatex}
+%\addbibresource{master.bib}
+
+\usepackage{mathtools}
+\usepackage{amsfonts,amsmath,amssymb,amsthm}
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+\usepackage{ marvosym }
+%\usepackage{array, tabularx}
+\usepackage{colortbl}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.8,0.8,0.8}
+\usepackage{graphicx}
+
+\hypersetup{pdfstartview={Fit}}
+
+
+\title{Fast Convergence of Regularized Learning in Games}
+\author{Malte Schledjewski}
+\institute{Saarbrücken Graduate School of Computer Science}
+\date{2016}
+
+\usetheme{Madrid}
+
+\begin{document}
+\frame{\titlepage}
+
+\section{Motivation}
+% paper: title, authors,...
+% Intuition of stablizing the system
+
+\section{Games}
+%regret
+
+
+\section{Contributions}
+% we only focus on Scoual Welfare
+
+\section{A special class of no-regret dynamics}
+\subsection{RVU property}
+% what do the terms mean
+\subsection{Dual norm}
+% explain dual norm -> max
+
+\section{Fast convergence of Social Welfare}
+  \subsection{Theorem 4} %with proof
+  \subsection{Optimistic Follow the Regularized Leader} % a lot
+
+\section{Robustness against adversary}
+
+\section{Experiment}
+% fast convergence, stable and better equilibrium (highe welfare)
+
+\section{Discussion}
+% is RVU needed? probably not
+
+\end{document}
