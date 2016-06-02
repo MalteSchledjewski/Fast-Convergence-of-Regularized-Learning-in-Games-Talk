@@ -31,6 +31,7 @@
 \newcommand{\opt}{\text{\textsc{Opt}} }
 \newcommand{\myprop}{\ensuremath{\texttt{RVU}}}
 
+\setbeamercolor{postit}{fg=black,bg=yellow}
 
 \title{Fast Convergence of Regularized Learning in Games}
 \author{Malte Schledjewski}
@@ -58,6 +59,28 @@
 	\end{block}
 \end{frame}
 
+
+\begin{frame}[c]
+	\begin{center}
+		\Huge Joshua: Shall we play a game?
+	\end{center}
+\end{frame}
+
+\subsection{The game}
+\begin{frame}
+	\frametitle{A little game}
+	\begin{itemize}
+		\item 4 bidders
+		\item 4 items each worth 20
+		\item each bidder has no extra value from more than one item
+		\item bids are integers in [1,20]
+		\item highest bid wins and must be paid
+		\item ties are broken arbitrarily 
+	\end{itemize}
+\end{frame}
+
+
+
 \subsection{Intuition}
 \begin{frame}
 	\frametitle{Basic intuition}
@@ -69,64 +92,122 @@
 		\end{itemize}
 		
 	we expect\pause
+	\begin{figure}[!tbp]
+		\centering
+		\begin{minipage}[b]{0.4\textwidth}
+			\includegraphics[height=3cm]{scrum} \pause
+		\end{minipage}
+		\hfill
+		\begin{minipage}[b]{0.4\textwidth}
+			\includegraphics[height=3cm]{Muixeranga2} \pause
+		\end{minipage}
+	\end{figure}
+	
 	\begin{itemize}
 		\item the dynamics to stabilize and
 		\item the utilities to approach a maximum (individually and as a group).
 	\end{itemize}
 \end{frame}
 
+\subsection{Finite set of strategies}
+\begin{frame}
+	\frametitle{Finite amount of strategies}
+	For a game G of $n$ players:\\
+	Each player $i$ has a finite strategy space $S_i$.
+	
+\pause
+	\begin{beamercolorbox}[sep=1em]{postit}
+		All combination to bid up to 20 for the four items.
+	\end{beamercolorbox}
+	\pause
+	Utility function $u_i : S_1 \times \ldots \times S_n \rightarrow [0,1]$
+	\pause
+	\begin{beamercolorbox}[sep=1em]{postit}
+		(value - cost) / 20
+	\end{beamercolorbox}
+\end{frame}
 
 
 
+\begin{frame}
+	\frametitle{You just made a friend\ldots}
+	\begin{columns}[T]
+		\begin{column}{.5\textwidth}
+			\includegraphics[height=7cm]{adversary} \pause
+		\end{column}
+		\begin{column}{.5\textwidth}
+			\begin{beamercolorbox}[sep=1em]{postit}
+				He is mean and simply gives the items to the other three guys.
+			\end{beamercolorbox}\pause
+			The adversary can choose the worst outcome for you.
+			
+			\vspace{1em}
+			\pause
+			So just be a little bit random and don't let the adversary know the result of the random draw.
+		\end{column}
+	\end{columns}
+	
+\end{frame}
 
 \subsection{One round}
 
 \begin{frame}
-	\frametitle{The setting}
-	\begin{block}{A single game G}
+	\frametitle{Repeat and repeat and repeat and\ldots}
+	\begin{block}{Mixed strategies}
 	\begin{itemize}
-		\item A static game $G$ of $n$ players.
-		\item For each player $i$:
-		\begin{itemize}
-			\item finite strategy space $S_i$ with cardinality $d$
-			\item utility function $u_i : S_1 \times \ldots \times S_n \rightarrow [0,1]$
-		\end{itemize} \pause
+		
 		\item $ w = (w_1 , \ldots, w_n)$, a profile of mixed strategies with
 		\begin{itemize}
 			\item $w_i \in \Delta(S_i)$
 			\item $w_{i,x}$ is the probability of strategy $x \in S_i$
 		\end{itemize}
 		%\item  $U_i(w) = \mathbb{E}_{s\sim{}w}[u_i(s)]$, the expected utility of player $i$
+		
 	\end{itemize}
+	\end{block}
+	\pause
+	\begin{block}{Repetition is good for learning}
+		The game G is repeatedly played for T time steps.\\
+		For each time step:
+		\begin{itemize}
+			\item Each player $i$ picks a mixed strategy $\mathbf{w}^t_i \in \Delta(S_i)$ 
+			\item Each player observes the expected utility for each strategy $x$: $\mathbf{u}^t_i = (u^t_{i,x})_{x \in S_i} $ with $ u^t_{i,x} = \mathbb{E}_{s_{-i} \sim w^t_{-i}} \left[u_i(x,s_{-i})\right] $
+		\end{itemize}
+		
+		The expected utility for a player $i$ in iteration $t$ is therefore 
+		$ \left\langle w^t_{i},u^t_{i}\right\rangle $.
 	\end{block}
 \end{frame}
 
-\subsection{Game dynamics and regret}
+
+\subsection{Regret}
+
 \begin{frame}
-	\frametitle{The setting}
-	The game G is repeatedly played for T time steps.\\
-	For each time step:
-	\begin{itemize}
-		\item Each player $i$ picks a mixed strategy $\mathbf{w}^t_i \in \Delta(S_i)$ 
-		\item Each player observes the expected utility for each strategy $x$: $\mathbf{u}^t_i = (u^t_{i,x})_{x \in S_i} $ with $ u^t_{i,x} = \mathbb{E}_{s_{-i} \sim w^t_{-i}} \left[u_i(x,s_{-i})\right] $
-	\end{itemize}
-	
-	The expected utility for a player $i$ in iteration $t$ is therefore 
-	$ \left\langle w^t_{i},u^t_{i}\right\rangle $.
-	\pause
-	\begin{block}{Regret}
-		\begin{equation*}
+	\frametitle{Regret or no regret -- that is the question}
+		\begin{block}{Regret}
+			\begin{equation*}
 			r_i(T) = \sup\limits_{\mathbf{w}^*_i \in \Delta (S_i)} \sum_{t=1}^{T} \left< \mathbf{w}^*_i - \mathbf{w}^t_i, \mathbf{u}^t_i \right>
-		\end{equation*}
-	
-	\end{block}
-	
+			\end{equation*}\pause
+			\begin{beamercolorbox}[sep=1em]{postit}
+				How much could you have gained if you had played the best (up to now) possible mixed strategy? 
+			\end{beamercolorbox}
+		\end{block}
+		\pause
+				\begin{block}{No-regret}
+					\begin{equation*}
+					r_i(T) \in o(T)
+					\end{equation*}\pause
+					\begin{beamercolorbox}[sep=1em]{postit}
+						So your average regret converges to 0.
+					\end{beamercolorbox}
+				\end{block}
 \end{frame}
+
 
 \subsection{No regret}
 \begin{frame}
-	\frametitle{No-regret}
-	Assume all players chose $\mathbf{w}^t_i$ based on a no-regret algorithm ($ r_i(T) \in o(T)$). \pause
+	\frametitle{No-regret suits you}
+	Assume all players chose $\mathbf{w}^t_i$ based on a no-regret learning algorithm.
 	
 	Suitable because:
 	\begin{itemize}
@@ -135,11 +216,47 @@
 		\item when played against each other
 		\begin{itemize}
 			\item the social welfare reaches an approximate optimum
-			\item the strategies converge to an equilibrium based with rates based on the regret bounds
+			\item the mixed strategies converge to an equilibrium based with rates based on the regret bounds
 		\end{itemize} 
 		\item there are well-known families of no-regret algorithms, for which the average regret vanishes at the worst-case rate of $O(1/\sqrt{T})$, which is unimprovable against fully adversarial environments.
 	\end{itemize}
 \end{frame}
+
+
+\subsection{No regret}
+\begin{frame}
+	\frametitle{Follow the white rabbit -- oh, I meant the leader}
+	\begin{block}{Follow the Leader}
+		Because you regret one mixed strategy the most, just play it in the next round.
+	\end{block}
+	\pause
+	\begin{beamercolorbox}[sep=1em]{postit}
+		What could go wrong?
+	\end{beamercolorbox}
+	\pause
+	\begin{block}{Bad example}
+		\begin{align*}
+			 f(T) =
+			\begin{cases}
+			-0.5       & \quad \text{if } t = 1 \\
+			1  & \quad \text{if } t \text{ is even}\\
+			-1  & \quad \text{if } t > 1 \text{ and } t \text{ is odd}\\
+			\end{cases}
+		\end{align*}
+		\begin{beamercolorbox}[sep=1em]{postit}
+			FTL predicts exactly the opposite.\\
+			Regret compared to constant 0 prediction grows linear.
+		\end{beamercolorbox}
+	\end{block}
+\end{frame}
+
+%stability
+%regret upper bounded by w-w
+
+
+
+
+
 
 \subsection{Smoothness}
 \begin{frame}
