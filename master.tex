@@ -34,6 +34,9 @@
 \DeclareMathOperator*{\argmax}{argmax}
 \newcommand{\R}{\ensuremath{\mathbb R}}
 
+
+\newtheorem{proposition}[theorem]{Proposition}
+
 \setbeamercolor{postit}{fg=black,bg=yellow}
 
 \title{Fast Convergence of Regularized Learning in Games}
@@ -77,6 +80,7 @@
 		\item 4 items each worth 20
 		\item each bidder has no extra value from more than one item
 		\item bids are integers in [1,20]
+		\item in every round each bidder only bids for one item 
 		\item highest bid wins and must be paid
 		\item ties are broken arbitrarily 
 	\end{itemize}
@@ -260,7 +264,7 @@
 	\begin{block}{Follow the Leader -- regret bound}
 		\begin{equation*}
 			r_i(T) =  \sum_{t=1}^{T} \left< \mathbf{w}^*_i - \mathbf{w}^t_i, \mathbf{u}^t_i \right> \leq
-			\sum_{t=1}^{T} \left< \mathbf{w}^t_i - \mathbf{w}^{t-1}_i, \mathbf{u}^t_i \right>
+			\sum_{t=1}^{T} \left< \mathbf{w}^{t+1}_i - \mathbf{w}^{t}_i, \mathbf{u}^t_i \right>
 		\end{equation*}
 	\end{block}
 	\pause
@@ -337,6 +341,13 @@
 \end{frame}
 
 
+\begin{frame}[c]
+	\begin{center}
+		\Huge Imagine all the other players were nicely behaving no-regret algorithms.\\\pause
+		Can we reduce our average regret faster?
+	\end{center}
+\end{frame}
+
 \section{Contributions}
 \subsection{Contributions}
 \begin{frame}
@@ -344,7 +355,7 @@
 	For a certain class of no-regret dynamics in smooth games, when played against each other:
 	\begin{itemize}
 		\item\alert<3>{ The average welfare converges to approximate optimum at the rate $O(1/T)$ instead of $O(1/\sqrt{T})$.}
-		\item The average welfare is at least $ (\lambda / (1 + \mu)) \text{OPT} - O(1/T) $.
+		%\item The average welfare is at least $ (\lambda / (1 + \mu)) \text{OPT} - O(1/T) $.
 		\item Each player's average regret converges to zero at rate $O(T^{-3/4})$.
 	\end{itemize}\pause
 	A black-box reduction that preserves the rate in favourable environments and maintains $\tilde{O}(1/\sqrt{T})$ against adversarial environments.
@@ -387,7 +398,7 @@
 	   =\sup_{\|w\| \leq 1} \dotp{w}{\vec{u}^t_i - \vec{u}^{t-1}_i} 
 	   =\max_{x \in S_i} \left| u_{i,x}^t - u_{i,x}^{t-1} \right|  \\}
 	   \onslide<2->{=&\max_{x \in S_i} \left| \E_{\vec{s}_{-i}\sim \vec{w}_{-i}^t}[u_i(x,\vec{s}_{-i})] - \E_{\vec{s}_{-i}\sim \vec{w}_{-i}^{t-1}} [u_i(x,\vec{s}_{-i})] \right| \\}
-	   \onslide<3->{=&\max_{x \in S_i} \left| \sum_{\tilde{s} \in \vec{s}_{-i}} u_i(x,\tilde{s}) ( \text{Prob}^t(\tilde{s}) - \text{Prob}^{t-1}(\tilde{s}))   \right|\\}
+	   \onslide<3->{=&\max_{x \in S_i} \left| \sum_{\tilde{s} \in \vec{s}_{-i}} u_i(x,\tilde{s}) \left( \text{Prob}^t(\tilde{s}) - \text{Prob}^{t-1}(\tilde{s})\right)   \right|\\}
 	   \onslide<4->{\leq&\max_{x \in S_i} \sum_{\tilde{s} \in \vec{s}_{-i}} u_i(x,\tilde{s})  \left| ( \text{Prob}^t(\tilde{s}) - \text{Prob}^{t-1}(\tilde{s}))   \right|\\}
 	   \onslide<5->{\leq& \sum_{\tilde{s} \in \vec{s}_{-i}} \left| \prod_{j\neq i} \mst_{j,\tilde{s}_j}^t - \prod_{j\neq i}\mst_{j,\tilde{s}_j}^{t-1}\right| }
 	   \onslide<6->{\leq \sum_{j\neq i} \|
@@ -426,15 +437,15 @@
 
     	\begin{align*}
     	\onslide<1->{\sum_{i\in N} r_i(T) &\leq 
-    	\sum_{i\in N} \left( \alpha
-    	+\beta \sum_{t=1}^{T} \| \vec{u}^t_i - \vec{u}^{t-1}_i\|_*^2 -
+    	\alert<2>{\sum_{i\in N}} \left( \alpha
+    	+\beta \alert<2>{\sum_{t=1}^{T}} \| \vec{u}^t_i - \vec{u}^{t-1}_i\|_*^2 -
     	\gamma\sum_{t=1}^{T} \|\vec{w}^{t}_i - \vec{w}^{t-1}_i \|^2 \right)\\}
-    	\onslide<2->{&=\alpha n + \sum_{t=1}^{T} \left( \beta \sum_{i\in N} \| \vec{u}^t_i - \vec{u}^{t-1}_i\|_*^2
+    	\onslide<2->{&=\alpha n + \sum_{t=1}^{T} \left( \beta \alert<3>{\sum_{i\in N} \| \vec{u}^t_i - \vec{u}^{t-1}_i\|_*^2}
     	- \gamma \sum_{i\in N} \|\vec{w}^{t}_i - \vec{w}^{t-1}_i \|^2  \right)\\}
     	\onslide<3->{\leq \alpha &n + \sum_{t=1}^{T} \left( \beta (n-1)^2 \sum_{i\in N} \| \vec{\mst}_i^t-
     	\vec{\mst}_i^{t-1}\|^2
     	- \gamma  \sum_{i\in N} \|\vec{w}^{t}_i - \vec{w}^{t-1}_i \|^2  \right)\\}
-    	\onslide<4->{&\leq \alpha n + \sum_{t=1}^{T} \left( \left(  \beta (n-1)^2 
+    	\onslide<4->{&\leq \alpha n + \sum_{t=1}^{T} \left( \left(  \alert<5>{\beta} (n-1)^2 
     	- \gamma \right)  \sum_{i\in N}\|\vec{w}^{t}_i - \vec{w}^{t-1}_i \|^2 \right)\\}
     	\onslide<5->{&\leq \alpha n + \sum_{t=1}^{T} \left( \left(  \frac{\gamma}{(n-1)^2}  (n-1)^2 
     	- \gamma \right)  \sum_{i\in N}\|\vec{w}^{t}_i - \vec{w}^{t-1}_i \|^2 \right)\\
@@ -443,10 +454,40 @@
     	
     \end{frame}
   
-\section[OFRL]{Optimistic Follow the Regularized Leader} % a lot
+  \begin{frame}
+  	\frametitle{Proof result}
+  	\begin{itemize}
+  		\item Average regret vanishes at the rate of $O(1/T)$.
+  		
+  		\item For a smooth game the social welfare reaches the approximate optimum.
+  		
+  	\end{itemize}
+  	
+  \end{frame}
+  
+\section[OFRL]{Recency bias} % a lot
 
 \begin{frame}
-	\frametitle{Placeholder}
+	\frametitle{Optimistic Follow the Regularized Leader}
+	\begin{block}{Optimistic Follow the Regularized Leader}
+		Let $\mR$ be a 1-strongly convex regularizer and\\
+		$\vec{M}_i^T$ be an adaptive prediction sequence:
+	\begin{equation*}
+	\vec{\mst}_i^T
+	= \argmax_{\vec{\mst} \in \Delta(S_i)} \dotp{\vec{\mst}}{\sum_{t=1}^{T-1} \vec{u}_i^t
+		+ \vec{M}_i^T}-\frac{\mR(\vec{\mst})}{\eta}.
+	\end{equation*}
+	\end{block}
+	\pause
+	\begin{block}{One-step recency bias}
+		With $\vec{M}_i^t = \vec{u}_i^{t-1}$ and using stepsize $\eta$, OFRL satisfies the \myprop~ property 
+		 with constants
+			$\alpha = R/\eta$, $\beta = \eta$ and $\gamma
+			= 1/(4\eta)$\\
+		where $R = \max_i \left(\sup_{\vec{f}\in \Delta(S_i)} \mR(\vec{f})-\inf_{\vec{f}\in \Delta(S_i)}\mR(\vec{f})\right)$.
+		
+	\end{block}
+	
 \end{frame}
 
 %\section{Robustness against adversary}
@@ -461,7 +502,9 @@
 		\item 4 items each worth 20
 		\item each bidder has no extra value from more than one item
 		\item bids are integers in [1,20]
+		\item in every round each bidder only bids for one item 
 		\item highest bid wins and must be paid
+		\item ties are broken arbitrarily 
 	\end{itemize}
 \end{frame}
 
