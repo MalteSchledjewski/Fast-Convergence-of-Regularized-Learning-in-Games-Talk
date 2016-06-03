@@ -20,16 +20,19 @@
 \usepackage{graphicx}
 \usepackage{subfigure}
 \hypersetup{pdfstartview={Fit}}
-
+\usepackage{soul}
 
 \newcommand{\E}{\mathbb{E}}
 \newcommand{\abs}[1]{\vert{#1}\vert}
 \renewcommand{\vec}[1]{\ensuremath{{\bf #1}}}
 \newcommand{\dotp}[2]{\ensuremath{\left\langle #1, #2 \right\rangle}}
-\newcommand{\st}{\ensuremath{s}}
+\newcommand{\strat}{\ensuremath{s}}
 \newcommand{\mst}{\ensuremath{w}}
 \newcommand{\opt}{\text{\textsc{Opt}} }
 \newcommand{\myprop}{\ensuremath{\texttt{RVU}}}
+\newcommand{\mR}{\ensuremath{\mathcal{R}}}
+\DeclareMathOperator*{\argmax}{argmax}
+\newcommand{\R}{\ensuremath{\mathbb R}}
 
 \setbeamercolor{postit}{fg=black,bg=yellow}
 
@@ -223,9 +226,9 @@
 \end{frame}
 
 
-\subsection{No regret}
+\subsection{Follow the white rabbit -- oh, I meant the leader}
 \begin{frame}
-	\frametitle{Follow the white rabbit -- oh, I meant the leader}
+	\frametitle{Follow the \st{white rabbit} Leader}
 	\begin{block}{Follow the Leader}
 		Because you regret one mixed strategy the most, just play it in the next round.
 	\end{block}
@@ -250,12 +253,52 @@
 	\end{block}
 \end{frame}
 
-%stability
-%regret upper bounded by w-w
+
+\subsection{You'd better be stable}
+\begin{frame}
+	\frametitle{You'd better be stable}
+	\begin{block}{Follow the Leader -- regret bound}
+		\begin{equation*}
+			r_i(T) =  \sum_{t=1}^{T} \left< \mathbf{w}^*_i - \mathbf{w}^t_i, \mathbf{u}^t_i \right> \leq
+			\sum_{t=1}^{T} \left< \mathbf{w}^t_i - \mathbf{w}^{t-1}_i, \mathbf{u}^t_i \right>
+		\end{equation*}
+	\end{block}
+	\pause
+	\begin{beamercolorbox}[sep=1em]{postit}
+		Stable algorithm do not change $\mathbf{w}^t_i$ that much.
+	\end{beamercolorbox}
+	\pause
+	\begin{block}{Follow the Regularized Leader }
+	\begin{equation*}
+	\vec{\mst}_i^T
+	= \argmax_{\vec{\mst} \in \Delta(S_i)} \dotp{\vec{\mst}}{\sum_{t=1}^{T-1} \vec{u}_i^t} \pause-\mR(\vec{\mst})
+	\end{equation*}
+	\end{block}
+\end{frame}
 
 
 
-
+\subsection{Regularize}
+\begin{frame}
+	\frametitle{Regularize}
+	\begin{block}{Entropic regularization}
+		\begin{equation*}
+		\mR(\vec{\mst}) = \sum_{i=1}^{d} \vec{\mst}_i log(\vec{\mst}_i)
+		\end{equation*}
+	\end{block}
+%	\pause
+%	\begin{beamercolorbox}[sep=1em]{postit}
+%		Stable algorithm do not change $\mathbf{w}^t_i$ that much.
+%	\end{beamercolorbox}
+	\pause
+	\begin{block}{Convexity }
+		Entropic regularization over the probability simplex ($ \left\lbrace \mst \in \R^d | \quad \| \mst\| = 1 \right\rbrace $) is 1-strongly convex.
+	\end{block}
+	\pause
+	\begin{block}{Bound}
+		For FRL regret is in $O(\sqrt{T})$.
+	\end{block}
+\end{frame}
 
 
 \subsection{Smoothness}
@@ -264,13 +307,16 @@
 	\begin{block}{Smooth game}
 		A game is
 		$(\lambda,\mu)$-smooth if there exists a strategy profile
-		$\vec{\st}^*$ such that for any strategy profile $\vec{\st}$:
+		$\vec{\strat}^*$ such that for any strategy profile $\vec{\strat}$:
 		
 		\begin{equation*}
-		\sum_{i\in N} u_i(\st_i^*,\vec{\st}_{-i}) \geq \lambda \opt - \mu
-		W(\vec{\st})
+		\sum_{i\in N} u_i(\strat_i^*,\vec{\strat}_{-i}) \geq \lambda \opt - \mu
+		W(\vec{\strat})
 		\end{equation*}
 	\end{block}
+		\begin{beamercolorbox}[sep=1em]{postit}
+			Your best mixed strategy is good no matter what others play.
+		\end{beamercolorbox}
 	\pause
 	\begin{block}{}
 		In a $(\lambda,\mu)$-smooth game, if each player $i$ suffers regret at
@@ -284,9 +330,14 @@
 \end{frame}
 
 
+\begin{frame}[c]
+	\begin{center}
+		\Huge Did I mention that there is paper to talk about?
+	\end{center}
+\end{frame}
+
+
 \section{Contributions}
-% we only focus on Social Welfare
-% previous O
 \subsection{Contributions}
 \begin{frame}
 	\frametitle{Contributions}
