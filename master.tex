@@ -32,12 +32,28 @@
 \newcommand{\myprop}{\ensuremath{\texttt{RVU}}}
 \newcommand{\mR}{\ensuremath{\mathcal{R}}}
 \DeclareMathOperator*{\argmax}{argmax}
+\DeclareMathOperator*{\argmin}{argmin}
 \newcommand{\R}{\ensuremath{\mathbb R}}
 
 
 \newtheorem{proposition}[theorem]{Proposition}
 
 \setbeamercolor{postit}{fg=black,bg=yellow}
+
+
+\newcommand{\inserteqstrut}[1]{%
+	\rlap{$\displaystyle#1$}%
+	\phantom{\biggesteq}}
+
+
+\newcommand{\biggesteq}{%
+	\vphantom{\sum_{i=1}^{d} w_i log(w_i)}% tallest/deepest
+	\hphantom{\sum_{i=1}^{d} w_i log(w_i)}% longest/widest
+}
+
+
+
+
 
 \title{Fast Convergence of Regularized Learning in Games}
 \author{Malte Schledjewski}
@@ -49,8 +65,6 @@
 \begin{document}
 	
 \frame{\titlepage}
-
-\section{Games}
 
 \begin{frame}
 	\frametitle{The paper}
@@ -66,492 +80,743 @@
 \end{frame}
 
 
+\section{Online learning}
+\subsection{Models}
 \begin{frame}[c]
 	\begin{center}
-		\Huge Joshua: Shall we play a game?
+		\Huge Online learning
 	\end{center}
 \end{frame}
 
-\subsection{The game}
+
 \begin{frame}
-	\frametitle{A little game}
-	\begin{itemize}
-		\item 4 bidders
-		\item 4 items each worth 20
-		\item each bidder has no extra value from more than one item
-		\item bids are integers in [1,20]
-		\item in every round each bidder only bids for one item 
-		\item highest bid wins and must be paid
-		\item ties are broken arbitrarily 
-	\end{itemize}
-\end{frame}
-
-
-
-\subsection{Intuition}
-\begin{frame}
-	\frametitle{Basic intuition}
-    If players are
+	\frametitle{Online learning}
+	\begin{block}{General model}
+		You try to map inputs $ x \in \mathcal{X}$ to outputs $y \in \mathcal{Y}$.\\  \pause
+		For each time step t: \pause
 		\begin{itemize}
-			\item smart,
-			\item selfish and
-			\item acting independently
+			\item You receive $x_t$. \pause 
+			\item You predict the output as $p_t$. \pause
+			\item You receive the correct output $y_t$. \pause
+			\item You suffer some loss $\ell(y_t,p_t)$. \pause
+			\item You update your model. \pause
 		\end{itemize}
 		
-	we expect\pause
-	\begin{figure}[!tbp]
-		\centering
-		\begin{minipage}[b]{0.4\textwidth}
-			\includegraphics[height=3cm]{scrum} \pause
-		\end{minipage}
-		\hfill
-		\begin{minipage}[b]{0.4\textwidth}
-			\includegraphics[height=3cm]{Muixeranga2} \pause
-		\end{minipage}
-	\end{figure}
-	
-	\begin{itemize}
-		\item the dynamics to stabilize and
-		\item the utilities to approach a maximum (individually and as a group).
-	\end{itemize}
-\end{frame}
-
-\subsection{Finite set of strategies}
-\begin{frame}
-	\frametitle{Finite amount of strategies}
-	For a game G of $n$ players:\\
-	Each player $i$ has a finite strategy space $S_i$.
-	
-\pause
-	\begin{beamercolorbox}[sep=1em]{postit}
-		All combination to bid up to 20 for the four items.
-	\end{beamercolorbox}
-	\pause
-	Utility function $u_i : S_1 \times \ldots \times S_n \rightarrow [0,1]$
-	\pause
-	\begin{beamercolorbox}[sep=1em]{postit}
-		(value - cost) / 20
-	\end{beamercolorbox}
-\end{frame}
-
-
-
-\begin{frame}
-	\frametitle{You just made a friend\ldots}
-	\begin{columns}[T]
-		\begin{column}{.5\textwidth}
-			\includegraphics[height=7cm]{adversary} \pause
-		\end{column}
-		\begin{column}{.5\textwidth}
-			\begin{beamercolorbox}[sep=1em]{postit}
-				He is mean and simply gives the items to the other three guys.
-			\end{beamercolorbox}\pause
-			The adversary can choose the worst outcome for you.
-			
-			\vspace{1em}
-			\pause
-			So just be a little bit random and don't let the adversary know the result of the random draw.
-		\end{column}
-	\end{columns}
-	
-\end{frame}
-
-\subsection{One round}
-
-\begin{frame}
-	\frametitle{Repeat and repeat and repeat and\ldots}
-	\begin{block}{Mixed strategies}
-	\begin{itemize}
-		
-		\item $ w = (w_1 , \ldots, w_n)$, a profile of mixed strategies with
-		\begin{itemize}
-			\item $w_i \in \Delta(S_i)$
-			\item $w_{i,x}$ is the probability of strategy $x \in S_i$
-		\end{itemize}
-		%\item  $U_i(w) = \mathbb{E}_{s\sim{}w}[u_i(s)]$, the expected utility of player $i$
-		
-	\end{itemize}
-	\end{block}
-	\pause
-	\begin{block}{Repetition is good for learning}
-		The game G is repeatedly played for T time steps.\\
-		For each time step:
-		\begin{itemize}
-			\item Each player $i$ picks a mixed strategy $\mathbf{w}^t_i \in \Delta(S_i)$ 
-			\item Each player observes the expected utility for each strategy $x$: $\mathbf{u}^t_i = (u^t_{i,x})_{x \in S_i} $ with $ u^t_{i,x} = \mathbb{E}_{s_{-i} \sim w^t_{-i}} \left[u_i(x,s_{-i})\right] $
-		\end{itemize}
-		
-		The expected utility for a player $i$ in iteration $t$ is therefore 
-		$ \left\langle w^t_{i},u^t_{i}\right\rangle $.
+		Your goal is minimal accumulated loss.
 	\end{block}
 \end{frame}
 
+\begin{frame}
+	\frametitle{Online learning}
+	\begin{block}{Prediction with Expert Advice}
+		Consider $d$ experts giving you advices.\\
+		Choose the best advice.\\ 
+		
+		For each time step t:\pause
+		\begin{itemize}
+			\item You receive $x_t$, a vector of $d$ advices. \pause 
+			\item You chose expert $p_t$ and follow his advice. \pause
+			\item You receive $y_t$, the vector of costs for following each of the advices. \pause
+			\item You suffer some loss $\ell(y_t,p_t) = y_{t,p_t}$. \pause
+			\item You update your model.
+		\end{itemize}
+	\end{block}
+\end{frame}
 
 \subsection{Regret}
-
 \begin{frame}
-	\frametitle{Regret or no regret -- that is the question}
-		\begin{block}{Regret}
-			\begin{equation*}
-			r_i(T) = \sup\limits_{\mathbf{w}^*_i \in \Delta (S_i)} \sum_{t=1}^{T} \left< \mathbf{w}^*_i - \mathbf{w}^t_i, \mathbf{u}^t_i \right>
-			\end{equation*}\pause
-			\begin{beamercolorbox}[sep=1em]{postit}
-				How much could you have gained if you had played the best (up to now) possible mixed strategy? 
-			\end{beamercolorbox}
-		\end{block}
-		\pause
-				\begin{block}{No-regret}
-					\begin{equation*}
-					r_i(T) \in o(T)
-					\end{equation*}\pause
-					\begin{beamercolorbox}[sep=1em]{postit}
-						So your average regret converges to 0.
-					\end{beamercolorbox}
-				\end{block}
-\end{frame}
+	\frametitle{Regret}
 
-
-\subsection{No regret}
-\begin{frame}
-	\frametitle{No-regret suits you}
-	Assume all players chose $\mathbf{w}^t_i$ based on a no-regret learning algorithm.
+	How do you know how good you are?
+	\pause
 	
-	Suitable because:
-	\begin{itemize}
-		\item regret-bounds hold against adversarial environments
-		\item each player's utility approaches optimality
-		\item when played against each other
-		\begin{itemize}
-			\item the social welfare reaches an approximate optimum
-			\item the mixed strategies converge to an equilibrium based with rates based on the regret bounds
-		\end{itemize} 
-		\item there are well-known families of no-regret algorithms, for which the average regret vanishes at the worst-case rate of $O(1/\sqrt{T})$, which is unimprovable against fully adversarial environments.
-	\end{itemize}
+	Compare yourself to the experts.
+	\pause
+	
+	\vspace{1em}
+	In each round there is an expert with minimal loss so far.\\
+	This is the \textcolor{blue}{leading expert}.
+	\pause
+	\begin{block}{Regret}
+		$r(T)$ := (your cumulated loss) - ( the leader's cumulated loss)
+	\end{block}
+
+	\pause
+	\begin{block}{No-regret algorithm}
+		A no-regret algorithm always achieves regret that is sublinear in T.
+	\end{block}
+
 \end{frame}
 
-
-\subsection{Follow the white rabbit -- oh, I meant the leader}
+\subsection{Follow the Leader}
 \begin{frame}
-	\frametitle{Follow the \st{white rabbit} Leader}
+	\frametitle{Follow the Leader}
+	
 	\begin{block}{Follow the Leader}
-		Because you regret one mixed strategy the most, just play it in the next round.
+		Always trust the currently leading expert with his advice for the next round. 
 	\end{block}
+	
 	\pause
-	\begin{beamercolorbox}[sep=1em]{postit}
-		What could go wrong?
-	\end{beamercolorbox}
-	\pause
-	\begin{block}{Bad example}
-		\begin{align*}
-			 f(T) =
-			\begin{cases}
-			-0.5       & \quad \text{if } t = 1 \\
-			1  & \quad \text{if } t \text{ is even}\\
-			-1  & \quad \text{if } t > 1 \text{ and } t \text{ is odd}\\
-			\end{cases}
-		\end{align*}
-		\begin{beamercolorbox}[sep=1em]{postit}
-			FTL predicts exactly the opposite.\\
-			Regret compared to constant 0 prediction grows linear.
-		\end{beamercolorbox}
-	\end{block}
+	
+	\begin{block}{Worst case regret is not sublinear}
+		Example:\\
+		Binary classification: $y \in \{A, B\}$\\
+		Two experts: one always predicts A, the other one always B\\
+		Your loss is 0 if you predict right or 1 if you predict wrong.\\ \pause
+		\vspace{1em}
+		In the worst case your prediction is always false.\\
+		Your regret is at least $T/2$.
+	\end{block}	
+\end{frame}
+
+\subsection{Randomness}
+\begin{frame}
+	\frametitle{Deterministic or not?}
+	
+	\begin{block}{An adversaries perspective}
+		Finite amount of experts and deterministic behaviour allow easy construction of worst case scenario.\\
+		Always make the algorithm's prediction false.
+	\end{block}	
+	 \pause
+	\begin{block}{Idea: randomness}
+		Instead of picking one expert just give the probabilities of choosing the experts.\\
+		The adversary is not allowed to know the draw.\\
+		We then try to minimize accumulated expected loss.
+	\end{block}	
 \end{frame}
 
 
-\subsection{You'd better be stable}
+\subsection{Stability}
 \begin{frame}
-	\frametitle{You'd better be stable}
-	\begin{block}{Follow the Leader -- regret bound}
-		\begin{equation*}
-			r_i(T) =  \sum_{t=1}^{T} \left< \mathbf{w}^*_i - \mathbf{w}^t_i, \mathbf{u}^t_i \right> \leq
-			\sum_{t=1}^{T} \left< \mathbf{w}^{t+1}_i - \mathbf{w}^{t}_i, \mathbf{u}^t_i \right>
-		\end{equation*}
-	\end{block}
-	\pause
-	\begin{beamercolorbox}[sep=1em]{postit}
-		Stable algorithm do not change $\mathbf{w}^t_i$ that much.
-	\end{beamercolorbox}
-	\pause
-	\begin{block}{Follow the Regularized Leader }
+	\frametitle{Stability is also important}
+		\begin{block}{Follow the Leader -- regret bound by cheating}
+			Let $f_1 ,\ldots, f_T$ be the sequence of loss functions and \\
+			$w_1 ,\ldots, w_T$ be the probabilities determined by \textit{Follow the Leader},
+			and $w^*$ the leading probabilities.
+			
+			\begin{equation*}
+				r(T) =  \sum_{t=1}^{T}  \left( f_t(w_t) - f_t(w^*) \right)
+				\leq
+				\sum_{t=1}^{T} \left( \underbrace{f_t(w_t) - f_t(w_{t+1})}_\text{ \onslide<2->{\textcolor{red}{stability}}} \right)
+			\end{equation*}
+		\end{block}
+
+\pause[3]
+	\begin{block}{Follow the Regularized Leader \only<4>{\textcolor{red}{with entropic regularizer}}}
 	\begin{equation*}
-	\vec{\mst}_i^T
-	= \argmax_{\vec{\mst} \in \Delta(S_i)} \dotp{\vec{\mst}}{\sum_{t=1}^{T-1} \vec{u}_i^t} \pause-\mR(\vec{\mst})
+	w_T
+	= \argmin_{w \in \Delta}  \left(\sum_{t=1}^{T-1} f_t(w) \right) + \frac{1}{\eta}  \only<3>{\inserteqstrut{\mR(w)}} \only<4>{\inserteqstrut{\sum_{i=1}^{d} w_i log(w_i)}}
 	\end{equation*}
 	\end{block}
+
 \end{frame}
 
 
-
-\subsection{Regularize}
+\subsection{Online learning summary}
 \begin{frame}
-	\frametitle{Regularize}
-	\begin{block}{Entropic regularization}
-		\begin{equation*}
-		\mR(\vec{\mst}) = \sum_{i=1}^{d} \vec{\mst}_i log(\vec{\mst}_i)
-		\end{equation*}
-	\end{block}
-%	\pause
-%	\begin{beamercolorbox}[sep=1em]{postit}
-%		Stable algorithm do not change $\mathbf{w}^t_i$ that much.
-%	\end{beamercolorbox}
-	\pause
-	\begin{block}{Convexity }
-		Entropic regularization over the probability simplex ($ \left\lbrace \mst \in \R^d | \quad \| \mst\| = 1 \right\rbrace $) is 1-strongly convex.
-	\end{block}
-	\pause
-	\begin{block}{Bound}
-		For FRL regret is in $O(\sqrt{T})$.
-	\end{block}
-\end{frame}
-
-
-\subsection{Smoothness}
-\begin{frame}
-	\frametitle{Smooth games}
-	\begin{block}{Smooth game}
-		A game is
-		$(\lambda,\mu)$-smooth if there exists a strategy profile
-		$\vec{\strat}^*$ such that for any strategy profile $\vec{\strat}$:
-		
-		\begin{equation*}
-		\sum_{i\in N} u_i(\strat_i^*,\vec{\strat}_{-i}) \geq \lambda \opt - \mu
-		W(\vec{\strat})
-		\end{equation*}
-	\end{block}
-		\begin{beamercolorbox}[sep=1em]{postit}
-			Your best mixed strategy is good no matter what others play.
-		\end{beamercolorbox}
-	\pause
-	\begin{block}{}
-		In a $(\lambda,\mu)$-smooth game, if each player $i$ suffers regret at
-		most $r_i(T)$, then:
-		\begin{equation*}
-		\frac{1}{T} \sum_{t=1}^{T}
-		W(\vec{\mst}^t) \geq \frac{\lambda}{1+\mu} \opt
-		- \frac{1}{1+\mu}\frac{1}{T}\sum_{i\in N} r_i(T)
-		\end{equation*}
-	\end{block}
-\end{frame}
-
-
-\begin{frame}[c]
-	\begin{center}
-		\Huge Did I mention that there is paper to talk about?
-	\end{center}
-\end{frame}
-
-
-\begin{frame}[c]
-	\begin{center}
-		\Huge Imagine all the other players were nicely behaving no-regret algorithms.\\\pause
-		Can we reduce our average regret faster?
-	\end{center}
-\end{frame}
-
-\section{Contributions}
-\subsection{Contributions}
-\begin{frame}
-	\frametitle{Contributions}
-	For a certain class of no-regret dynamics in smooth games, when played against each other:
+	\frametitle{Online learning summary}
 	\begin{itemize}
-		\item\alert<3>{ The average welfare converges to approximate optimum at the rate $O(1/T)$ instead of $O(1/\sqrt{T})$.}
-		%\item The average welfare is at least $ (\lambda / (1 + \mu)) \text{OPT} - O(1/T) $.
-		\item Each player's average regret converges to zero at rate $O(T^{-3/4})$.
-	\end{itemize}\pause
-	A black-box reduction that preserves the rate in favourable environments and maintains $\tilde{O}(1/\sqrt{T})$ against adversarial environments.
+		\item Expert Advice Framework \pause
+		\item Regret \pause
+		\item Randomness + stability \pause
+	\end{itemize}
+	
+	\begin{block}{Follow the Regularized Leader}
+		\textit{Follow the Regularized Leader} is a no-regret algorithm with $r(T)\in O(\sqrt(T))$.
+	\end{block}
 \end{frame}
 
 
 
 
-\section[A class of no-regret dynamics]{A special class of no-regret dynamics}
+\section{Games}
+\begin{frame}[c]
+	\begin{center}
+		\Huge Games
+	\end{center}
+\end{frame}
+% Games
+  % matching pennies
+  % theoretical model
+  % played against adversarial environment
+
+
+\section{Playing under nice conditions}
+% two players zero-sum games
+
+% RVU property
+% when played against each other
+% bound + proof
 \subsection{RVU property}
 % what do the terms mean
 
 \begin{frame}
 	\frametitle{RVU property}
 	\begin{block}{RVU -- Regret bounded by Variation in Utilities}
-		A vanishing regret algorithm has the RVU property with parameters $\alpha>0$ and $0<\beta\leq\gamma$ and a pair of dual norms $(\|\cdot\|, \|\cdot\|_*)$ if for any sequence of utilities $\vec{u}^1, \vec{u}^2, \ldots, \vec{u}^T$ the regret is bounded as 
+		A vanishing regret algorithm has the RVU property with parameters $\alpha>0$ and $0<\beta\leq\gamma$  if for any sequence of utilities $\vec{u}^1, \vec{u}^2, \ldots, \vec{u}^T$ the regret is bounded as 
 		\begin{equation*}
-		\sum_{t=1}^{T} \dotp{\vec{w}^*- \vec{w}^t}{\vec{u}^t} \leq \alpha
-		+\beta \sum_{t=1}^{T} \| \vec{u}^t - \vec{u}^{t-1}\|_*^2 -
-		\gamma\sum_{t=1}^{T} \|\vec{w}^{t} - \vec{w}^{t-1}\|^2
+		r(T) \leq \alpha
+		+\beta \sum_{t=1}^{T} \max_{x \in S_i} \left| u_{i,x}^t - u_{i,x}^{t-1} \right|_1^2 -
+		\gamma\sum_{t=1}^{T} \left\|\vec{w}^{t} - \vec{w}^{t-1}\right\|^2_1
 		\end{equation*}  
 	\end{block}
 	
-	\begin{block}{Dual to a norm}
-		The dual to a norm
-		$\|\cdot\|$ is defined as $\|u\|_* = \sup_{\|w\| \leq 1}
-		\dotp{w}{u}$.
-	\end{block}
+
 \end{frame}
 
-\subsection{The middle term}
-% explain dual norm -> max
+%\section[Social welfare]{Fast convergence of social welfare}
+  \subsection{All player's average regret} %with proof
+  \begin{frame}
+  	\frametitle{All player's average regret}
+	
+	\begin{block}{Fast convergence of all player's average regret}
+		Suppose that the algorithm of each player $i$ satisfies the \myprop~property
+		with parameters $\alpha, \beta$ and $\gamma$ such that \textcolor{olive}{
+		$\beta\leq \gamma/(n-1)^2$}. \\
+		Then $\sum_{i\in N} r_i(T) \leq \alpha n$ and therefore all player's average regret converges at a rate of $O(1/T)$.
+	\end{block}
+	\pause
+
+    	\begin{align*}
+    	\onslide<2->{\sum_{i\in N} r_i(T) &\leq 
+    	\alert<3>{\sum_{i\in N}} \left( \alpha
+    	+\beta \alert<3>{\sum_{t=1}^{T}} \max_{x \in S_i} \left| u_{i,x}^t - u_{i,x}^{t-1} \right|^2 -
+    	\gamma\alert<3>{\sum_{t=1}^{T}} \left\|\vec{w}^{t} - \vec{w}^{t-1}\right\|^2_1 \right)\\}
+    	\onslide<3->{&=\alpha n + \sum_{t=1}^{T} \left( \beta \alert<4>{\sum_{i\in N}  \max_{x \in S_i} \left| u_{i,x}^t - u_{i,x}^{t-1} \right|^2}
+    	- \gamma \alt<4>{\textcolor{blue}{\sum_{i\in N} \left\|\vec{w}^{t} - \vec{w}^{t-1}\right\|^2_1}}{\textcolor{black}{\sum_{i\in N} \left\|\vec{w}^{t} - \vec{w}^{t-1}\right\|^2_1}}  \right)}
+    	\end{align*}
+
+
+  \end{frame}
 
 \begin{frame}
-	\frametitle{An observation on $ \| \vec{u}^t - \vec{u}^{t-1}\|_*^2 $}
-	We will now use the $\ell_1$ norm.
+	\frametitle{Proof - intermediate step}
 	
 	\begin{align*}
-		\onslide<1->{&\| \vec{u}^t_i - \vec{u}^{t-1}_i \|_*
-	   =\sup_{\|w\| \leq 1} \dotp{w}{\vec{u}^t_i - \vec{u}^{t-1}_i} 
-	   =\max_{x \in S_i} \left| u_{i,x}^t - u_{i,x}^{t-1} \right|  \\}
+		&\textcolor{red}{\max_{x \in S_i} \left| u_{i,x}^t - u_{i,x}^{t-1} \right|}\\
 	   \onslide<2->{=&\max_{x \in S_i} \left| \E_{\vec{s}_{-i}\sim \vec{w}_{-i}^t}[u_i(x,\vec{s}_{-i})] - \E_{\vec{s}_{-i}\sim \vec{w}_{-i}^{t-1}} [u_i(x,\vec{s}_{-i})] \right| \\}
 	   \onslide<3->{=&\max_{x \in S_i} \left| \sum_{\tilde{s} \in \vec{s}_{-i}} u_i(x,\tilde{s}) \left( \text{Prob}^t(\tilde{s}) - \text{Prob}^{t-1}(\tilde{s})\right)   \right|\\}
 	   \onslide<4->{\leq&\max_{x \in S_i} \sum_{\tilde{s} \in \vec{s}_{-i}} u_i(x,\tilde{s})  \left| ( \text{Prob}^t(\tilde{s}) - \text{Prob}^{t-1}(\tilde{s}))   \right|\\}
 	   \onslide<5->{\leq& \sum_{\tilde{s} \in \vec{s}_{-i}} \left| \prod_{j\neq i} \mst_{j,\tilde{s}_j}^t - \prod_{j\neq i}\mst_{j,\tilde{s}_j}^{t-1}\right| }
 	   \onslide<6->{\leq \sum_{j\neq i} \|
-	   \vec{\mst}_j^t-\vec{\mst}_j^{t-1}\|}
+	   \vec{\mst}_j^t-\vec{\mst}_j^{t-1}\|}\\
+		\onslide<7->{\Rightarrow &\textcolor{red}{\sum_{i\in N} \max_{x \in S_i} \left| u_{i,x}^t - u_{i,x}^{t-1} \right|^2}
+		\leq (n-1)^2 \textcolor{blue}{\sum_{i\in N} \| \vec{\mst}_i^t-
+		\vec{\mst}_i^{t-1}\|^2}}
 	\end{align*}
 \end{frame}
 
-\section[Social welfare]{Fast convergence of social welfare}
-  \subsection{Theorem 4} %with proof
-  \begin{frame}
-  	\frametitle{Fast convergence of social welfare}
+\begin{frame}
+	\frametitle{Proof - continued}
 	
-	\begin{block}{Fast convergence of social welfare}
-		Suppose that the algorithm of each player $i$ satisfies the \myprop~property
-		with parameters $\alpha, \beta$ and $\gamma$ such that
-		$\beta\leq \gamma/(n-1)^2$ and $\|\cdot\| = \|\cdot\|_1$. \\
-		Then $\sum_{i\in N} r_i(T) \leq \alpha n$ and therefore the social welfare converges at a rate of $O(1/T)$.
-	\end{block}
-	\pause
 	\begin{align*}
-	\onslide<2->{&\text{Our previous observation: } \| \vec{u}^t - \vec{u}^{t-1} \|_*
-	\leq \sum_{j\neq i} \| \vec{\mst}_j^t-\vec{\mst}_j^{t-1}\|\\
-	&\sum_{i\in N} \|\vec{u}_i^t-\vec{u}_i^{t-1}\|_*^2
-	\leq \sum_{i\in N} \left(\sum_{j\neq i} \| \vec{\mst}_j^t-\vec{\mst}_j^{t-1}\|\right)^2 \\}
-	\onslide<3->{&\leq \sum_{i\in N}  \left((n-1) \sum_{j\neq i} \| \vec{\mst}_j^t-
-	\vec{\mst}_j^{t-1}\|^2 \right)
-	= (n-1)^2 \sum_{i\in N} \| \vec{\mst}_i^t-
-	\vec{\mst}_i^{t-1}\|^2}
+	\onslide<1->{\sum_{i\in N} r_i(T) &\leq 
+		\alpha n + \sum_{t=1}^{T} \left( \beta \alert<1>{\sum_{i\in N}  \max_{x \in S_i} \left| u_{i,x}^t - u_{i,x}^{t-1} \right|^2}
+		- \gamma \alt<1>{\textcolor{blue}{\sum_{i\in N} \left\|\vec{w}^{t} - \vec{w}^{t-1}\right\|^2_1} }{\textcolor{black}{\sum_{i\in N} \left\|\vec{w}^{t} - \vec{w}^{t-1}\right\|^2_1}} \right)\\}
+	\onslide<2->{
+		=&\alpha n + \sum_{t=1}^{T} \left( \beta (n-1)^2 \alt<2>{\textcolor{blue}{\sum_{i\in N} \left\|\vec{w}^{t} - \vec{w}^{t-1}\right\|^2_1}}{\textcolor{black}{\sum_{i\in N} \left\|\vec{w}^{t} - \vec{w}^{t-1}\right\|^2_1}}
+		- \gamma \alt<2>{\textcolor{blue}{\sum_{i\in N} \left\|\vec{w}^{t} - \vec{w}^{t-1}\right\|^2_1}}{\textcolor{black}{\sum_{i\in N} \left\|\vec{w}^{t} - \vec{w}^{t-1}\right\|^2_1}}  \right)\\}
+	\onslide<3->{
+		=&\alpha n + \sum_{t=1}^{T} \left( \underbrace{\left(\beta (n-1)^2 - \gamma\right)}_{\leq 0} \alt<3>{\textcolor{blue}{\sum_{i\in N} \left\|\vec{w}^{t} - \vec{w}^{t-1}\right\|^2_1} }{\sum_{i\in N} \left\|\vec{w}^{t} - \vec{w}^{t-1}\right\|^2_1} \right)\\
+		\leq& \alpha n}
 	\end{align*}
+\end{frame}
 
-  \end{frame}
-  
-    \begin{frame}
-    	\frametitle{Proof, continued}
-    	
 
-    	\begin{align*}
-    	\onslide<1->{\sum_{i\in N} r_i(T) &\leq 
-    	\alert<2>{\sum_{i\in N}} \left( \alpha
-    	+\beta \alert<2>{\sum_{t=1}^{T}} \| \vec{u}^t_i - \vec{u}^{t-1}_i\|_*^2 -
-    	\gamma\sum_{t=1}^{T} \|\vec{w}^{t}_i - \vec{w}^{t-1}_i \|^2 \right)\\}
-    	\onslide<2->{&=\alpha n + \sum_{t=1}^{T} \left( \beta \alert<3>{\sum_{i\in N} \| \vec{u}^t_i - \vec{u}^{t-1}_i\|_*^2}
-    	- \gamma \sum_{i\in N} \|\vec{w}^{t}_i - \vec{w}^{t-1}_i \|^2  \right)\\}
-    	\onslide<3->{\leq \alpha &n + \sum_{t=1}^{T} \left( \beta (n-1)^2 \sum_{i\in N} \| \vec{\mst}_i^t-
-    	\vec{\mst}_i^{t-1}\|^2
-    	- \gamma  \sum_{i\in N} \|\vec{w}^{t}_i - \vec{w}^{t-1}_i \|^2  \right)\\}
-    	\onslide<4->{&\leq \alpha n + \sum_{t=1}^{T} \left( \left(  \alert<5>{\beta} (n-1)^2 
-    	- \gamma \right)  \sum_{i\in N}\|\vec{w}^{t}_i - \vec{w}^{t-1}_i \|^2 \right)\\}
-    	\onslide<5->{&\leq \alpha n + \sum_{t=1}^{T} \left( \left(  \frac{\gamma}{(n-1)^2}  (n-1)^2 
-    	- \gamma \right)  \sum_{i\in N}\|\vec{w}^{t}_i - \vec{w}^{t-1}_i \|^2 \right)\\
-    	&\leq \alpha n}
-    	\end{align*}
-    	
-    \end{frame}
-  
-  \begin{frame}
-  	\frametitle{Proof result}
-  	\begin{itemize}
-  		\item Average regret vanishes at the rate of $O(1/T)$.
-  		
-  		\item For a smooth game the social welfare reaches the approximate optimum.
-  		
-  	\end{itemize}
-  	
-  \end{frame}
-  
-\section[OFRL]{Recency bias} % a lot
+
+
+
+
+
+% OFRL
+% recency bias
+
+% social welfare
+% smooth games
+
+% each player's average regret
+
+% blackbox reduction 
+
+
+% experiment
+
+% results + discussion
+
+
+
+
+
+
+
+
 
 \begin{frame}
-	\frametitle{Optimistic Follow the Regularized Leader}
-	\begin{block}{Optimistic Follow the Regularized Leader}
-		Let $\mR$ be a 1-strongly convex regularizer and\\
-		$\vec{M}_i^T$ be an adaptive prediction sequence:
-	\begin{equation*}
-	\vec{\mst}_i^T
-	= \argmax_{\vec{\mst} \in \Delta(S_i)} \dotp{\vec{\mst}}{\sum_{t=1}^{T-1} \vec{u}_i^t
-		+ \vec{M}_i^T}-\frac{\mR(\vec{\mst})}{\eta}.
-	\end{equation*}
-	\end{block}
-	\pause
-	\begin{block}{One-step recency bias}
-		With $\vec{M}_i^t = \vec{u}_i^{t-1}$ and using stepsize $\eta$, OFRL satisfies the \myprop~ property 
-		 with constants
-			$\alpha = R/\eta$, $\beta = \eta$ and $\gamma
-			= 1/(4\eta)$\\
-		where $R = \max_i \left(\sup_{\vec{f}\in \Delta(S_i)} \mR(\vec{f})-\inf_{\vec{f}\in \Delta(S_i)}\mR(\vec{f})\right)$.
-		
-	\end{block}
+	Placeholder
+\end{frame}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%\subsection{Finite set of strategies}
+%\begin{frame}
+%	\frametitle{Finite amount of strategies}
+%	For a game G of $n$ players:\\
+%	Each player $i$ has a finite strategy space $S_i$.
+%	
+%\pause
+%	\begin{beamercolorbox}[sep=1em]{postit}
+%		All combination to bid up to 20 for the four items.
+%	\end{beamercolorbox}
+%	\pause
+%	Utility function $u_i : S_1 \times \ldots \times S_n \rightarrow [0,1]$
+%	\pause
+%	\begin{beamercolorbox}[sep=1em]{postit}
+%		(value - cost) / 20
+%	\end{beamercolorbox}
+%\end{frame}
+%
+%
+%
+%\begin{frame}
+%	\frametitle{You just made a friend\ldots}
+%	\begin{columns}[T]
+%		\begin{column}{.5\textwidth}
+%			\includegraphics[height=7cm]{adversary} \pause
+%		\end{column}
+%		\begin{column}{.5\textwidth}
+%			\begin{beamercolorbox}[sep=1em]{postit}
+%				He is mean and simply gives the items to the other three guys.
+%			\end{beamercolorbox}\pause
+%			The adversary can choose the worst outcome for you.
+%			
+%			\vspace{1em}
+%			\pause
+%			So just be a little bit random and don't let the adversary know the result of the random draw.
+%		\end{column}
+%	\end{columns}
+%	
+%\end{frame}
+%
+%\subsection{One round}
+%
+%\begin{frame}
+%	\frametitle{Repeat and repeat and repeat and\ldots}
+%	\begin{block}{Mixed strategies}
+%	\begin{itemize}
+%		
+%		\item $ w = (w_1 , \ldots, w_n)$, a profile of mixed strategies with
+%		\begin{itemize}
+%			\item $w_i \in \Delta(S_i)$
+%			\item $w_{i,x}$ is the probability of strategy $x \in S_i$
+%		\end{itemize}
+%		%\item  $U_i(w) = \mathbb{E}_{s\sim{}w}[u_i(s)]$, the expected utility of player $i$
+%		
+%	\end{itemize}
+%	\end{block}
+%	\pause
+%	\begin{block}{Repetition is good for learning}
+%		The game G is repeatedly played for T time steps.\\
+%		For each time step:
+%		\begin{itemize}
+%			\item Each player $i$ picks a mixed strategy $\mathbf{w}^t_i \in \Delta(S_i)$ 
+%			\item Each player observes the expected utility for each strategy $x$: $\mathbf{u}^t_i = (u^t_{i,x})_{x \in S_i} $ with $ u^t_{i,x} = \mathbb{E}_{s_{-i} \sim w^t_{-i}} \left[u_i(x,s_{-i})\right] $
+%		\end{itemize}
+%		
+%		The expected utility for a player $i$ in iteration $t$ is therefore 
+%		$ \left\langle w^t_{i},u^t_{i}\right\rangle $.
+%	\end{block}
+%\end{frame}
+%
+%
+%\subsection{Regret}
+%
+%\begin{frame}
+%	\frametitle{Regret or no regret -- that is the question}
+%		\begin{block}{Regret}
+%			\begin{equation*}
+%			r_i(T) = \sup\limits_{\mathbf{w}^*_i \in \Delta (S_i)} \sum_{t=1}^{T} \left< \mathbf{w}^*_i - \mathbf{w}^t_i, \mathbf{u}^t_i \right>
+%			\end{equation*}\pause
+%			\begin{beamercolorbox}[sep=1em]{postit}
+%				How much could you have gained if you had played the best (up to now) possible mixed strategy? 
+%			\end{beamercolorbox}
+%		\end{block}
+%		\pause
+%				\begin{block}{No-regret}
+%					\begin{equation*}
+%					r_i(T) \in o(T)
+%					\end{equation*}\pause
+%					\begin{beamercolorbox}[sep=1em]{postit}
+%						So your average regret converges to 0.
+%					\end{beamercolorbox}
+%				\end{block}
+%\end{frame}
+%
+%
+%\subsection{No regret}
+%\begin{frame}
+%	\frametitle{No-regret suits you}
+%	Assume all players chose $\mathbf{w}^t_i$ based on a no-regret learning algorithm.
+%	
+%	Suitable because:
+%	\begin{itemize}
+%		\item regret-bounds hold against adversarial environments
+%		\item each player's utility approaches optimality
+%		\item when played against each other
+%		\begin{itemize}
+%			\item the social welfare reaches an approximate optimum
+%			\item the mixed strategies converge to an equilibrium based with rates based on the regret bounds
+%		\end{itemize} 
+%		\item there are well-known families of no-regret algorithms, for which the average regret vanishes at the worst-case rate of $O(1/\sqrt{T})$, which is unimprovable against fully adversarial environments.
+%	\end{itemize}
+%\end{frame}
+%
+%
+%\subsection{Follow the white rabbit -- oh, I meant the leader}
+%\begin{frame}
+%	\frametitle{Follow the \st{white rabbit} Leader}
+%	\begin{block}{Follow the Leader}
+%		Because you regret one mixed strategy the most, just play it in the next round.
+%	\end{block}
+%	\pause
+%	\begin{beamercolorbox}[sep=1em]{postit}
+%		What could go wrong?
+%	\end{beamercolorbox}
+%	\pause
+%	\begin{block}{Bad example}
+%		\begin{align*}
+%			 f(T) =
+%			\begin{cases}
+%			-0.5       & \quad \text{if } t = 1 \\
+%			1  & \quad \text{if } t \text{ is even}\\
+%			-1  & \quad \text{if } t > 1 \text{ and } t \text{ is odd}\\
+%			\end{cases}
+%		\end{align*}
+%		\begin{beamercolorbox}[sep=1em]{postit}
+%			FTL predicts exactly the opposite.\\
+%			Regret compared to constant 0 prediction grows linear.
+%		\end{beamercolorbox}
+%	\end{block}
+%\end{frame}
+%
+%
+%\subsection{You'd better be stable}
+%\begin{frame}
+%	\frametitle{You'd better be stable}
+%	\begin{block}{Follow the Leader -- regret bound}
+%		\begin{equation*}
+%			r_i(T) =  \sum_{t=1}^{T} \left< \mathbf{w}^*_i - \mathbf{w}^t_i, \mathbf{u}^t_i \right> \leq
+%			\sum_{t=1}^{T} \left< \mathbf{w}^{t+1}_i - \mathbf{w}^{t}_i, \mathbf{u}^t_i \right>
+%		\end{equation*}
+%	\end{block}
+%	\pause
+%	\begin{beamercolorbox}[sep=1em]{postit}
+%		Stable algorithm do not change $\mathbf{w}^t_i$ that much.
+%	\end{beamercolorbox}
+%	\pause
+%	\begin{block}{Follow the Regularized Leader }
+%	\begin{equation*}
+%	\vec{\mst}_i^T
+%	= \argmax_{\vec{\mst} \in \Delta(S_i)} \dotp{\vec{\mst}}{\sum_{t=1}^{T-1} \vec{u}_i^t} \pause-\mR(\vec{\mst})
+%	\end{equation*}
+%	\end{block}
+%\end{frame}
+%
+%
+%
+%\subsection{Regularize}
+%\begin{frame}
+%	\frametitle{Regularize}
+%	\begin{block}{Entropic regularization}
+%		\begin{equation*}
+%		\mR(\vec{\mst}) = \sum_{i=1}^{d} \vec{\mst}_i log(\vec{\mst}_i)
+%		\end{equation*}
+%	\end{block}
+%%	\pause
+%%	\begin{beamercolorbox}[sep=1em]{postit}
+%%		Stable algorithm do not change $\mathbf{w}^t_i$ that much.
+%%	\end{beamercolorbox}
+%	\pause
+%	\begin{block}{Convexity }
+%		Entropic regularization over the probability simplex ($ \left\lbrace \mst \in \R^d | \quad \| \mst\| = 1 \right\rbrace $) is 1-strongly convex.
+%	\end{block}
+%	\pause
+%	\begin{block}{Bound}
+%		For FRL regret is in $O(\sqrt{T})$.
+%	\end{block}
+%\end{frame}
+%
+%
+%\subsection{Smoothness}
+%\begin{frame}
+%	\frametitle{Smooth games}
+%	\begin{block}{Smooth game}
+%		A game is
+%		$(\lambda,\mu)$-smooth if there exists a strategy profile
+%		$\vec{\strat}^*$ such that for any strategy profile $\vec{\strat}$:
+%		
+%		\begin{equation*}
+%		\sum_{i\in N} u_i(\strat_i^*,\vec{\strat}_{-i}) \geq \lambda \opt - \mu
+%		W(\vec{\strat})
+%		\end{equation*}
+%	\end{block}
+%		\begin{beamercolorbox}[sep=1em]{postit}
+%			Your best mixed strategy is good no matter what others play.
+%		\end{beamercolorbox}
+%	\pause
+%	\begin{block}{}
+%		In a $(\lambda,\mu)$-smooth game, if each player $i$ suffers regret at
+%		most $r_i(T)$, then:
+%		\begin{equation*}
+%		\frac{1}{T} \sum_{t=1}^{T}
+%		W(\vec{\mst}^t) \geq \frac{\lambda}{1+\mu} \opt
+%		- \frac{1}{1+\mu}\frac{1}{T}\sum_{i\in N} r_i(T)
+%		\end{equation*}
+%	\end{block}
+%\end{frame}
+%
+
+%
+%\begin{frame}[c]
+%	\begin{center}
+%		\Huge Imagine all the other players were nicely behaving no-regret algorithms.\\\pause
+%		Can we reduce our average regret faster?
+%	\end{center}
+%\end{frame}
+%
+%\section{Contributions}
+%\subsection{Contributions}
+%\begin{frame}
+%	\frametitle{Contributions}
+%	For a certain class of no-regret dynamics in smooth games, when played against each other:
+%	\begin{itemize}
+%		\item\alert<3>{ The average welfare converges to approximate optimum at the rate $O(1/T)$ instead of $O(1/\sqrt{T})$.}
+%		%\item The average welfare is at least $ (\lambda / (1 + \mu)) \text{OPT} - O(1/T) $.
+%		\item Each player's average regret converges to zero at rate $O(T^{-3/4})$.
+%	\end{itemize}\pause
+%	A black-box reduction that preserves the rate in favourable environments and maintains $\tilde{O}(1/\sqrt{T})$ against adversarial environments.
+%\end{frame}
+%
+%
+%
+%
+%\section[A class of no-regret dynamics]{A special class of no-regret dynamics}
+%\subsection{RVU property}
+%% what do the terms mean
+%
+%\begin{frame}
+%	\frametitle{RVU property}
+%	\begin{block}{RVU -- Regret bounded by Variation in Utilities}
+%		A vanishing regret algorithm has the RVU property with parameters $\alpha>0$ and $0<\beta\leq\gamma$ and a pair of dual norms $(\|\cdot\|, \|\cdot\|_*)$ if for any sequence of utilities $\vec{u}^1, \vec{u}^2, \ldots, \vec{u}^T$ the regret is bounded as 
+%		\begin{equation*}
+%		\sum_{t=1}^{T} \dotp{\vec{w}^*- \vec{w}^t}{\vec{u}^t} \leq \alpha
+%		+\beta \sum_{t=1}^{T} \| \vec{u}^t - \vec{u}^{t-1}\|_*^2 -
+%		\gamma\sum_{t=1}^{T} \|\vec{w}^{t} - \vec{w}^{t-1}\|^2
+%		\end{equation*}  
+%	\end{block}
+%	
+%	\begin{block}{Dual to a norm}
+%		The dual to a norm
+%		$\|\cdot\|$ is defined as $\|u\|_* = \sup_{\|w\| \leq 1}
+%		\dotp{w}{u}$.
+%	\end{block}
+%\end{frame}
+%
+%\subsection{The middle term}
+%% explain dual norm -> max
+%
+%\begin{frame}
+%	\frametitle{An observation on $ \| \vec{u}^t - \vec{u}^{t-1}\|_*^2 $}
+%	We will now use the $\ell_1$ norm.
+%	
+%	\begin{align*}
+%		\onslide<1->{&\| \vec{u}^t_i - \vec{u}^{t-1}_i \|_*
+%	   =\sup_{\|w\| \leq 1} \dotp{w}{\vec{u}^t_i - \vec{u}^{t-1}_i} 
+%	   =\max_{x \in S_i} \left| u_{i,x}^t - u_{i,x}^{t-1} \right|  \\}
+%	   \onslide<2->{=&\max_{x \in S_i} \left| \E_{\vec{s}_{-i}\sim \vec{w}_{-i}^t}[u_i(x,\vec{s}_{-i})] - \E_{\vec{s}_{-i}\sim \vec{w}_{-i}^{t-1}} [u_i(x,\vec{s}_{-i})] \right| \\}
+%	   \onslide<3->{=&\max_{x \in S_i} \left| \sum_{\tilde{s} \in \vec{s}_{-i}} u_i(x,\tilde{s}) \left( \text{Prob}^t(\tilde{s}) - \text{Prob}^{t-1}(\tilde{s})\right)   \right|\\}
+%	   \onslide<4->{\leq&\max_{x \in S_i} \sum_{\tilde{s} \in \vec{s}_{-i}} u_i(x,\tilde{s})  \left| ( \text{Prob}^t(\tilde{s}) - \text{Prob}^{t-1}(\tilde{s}))   \right|\\}
+%	   \onslide<5->{\leq& \sum_{\tilde{s} \in \vec{s}_{-i}} \left| \prod_{j\neq i} \mst_{j,\tilde{s}_j}^t - \prod_{j\neq i}\mst_{j,\tilde{s}_j}^{t-1}\right| }
+%	   \onslide<6->{\leq \sum_{j\neq i} \|
+%	   \vec{\mst}_j^t-\vec{\mst}_j^{t-1}\|}
+%	\end{align*}
+%\end{frame}
+%
+%\section[Social welfare]{Fast convergence of social welfare}
+%  \subsection{Theorem 4} %with proof
+%  \begin{frame}
+%  	\frametitle{Fast convergence of social welfare}
+%	
+%	\begin{block}{Fast convergence of social welfare}
+%		Suppose that the algorithm of each player $i$ satisfies the \myprop~property
+%		with parameters $\alpha, \beta$ and $\gamma$ such that
+%		$\beta\leq \gamma/(n-1)^2$ and $\|\cdot\| = \|\cdot\|_1$. \\
+%		Then $\sum_{i\in N} r_i(T) \leq \alpha n$ and therefore the social welfare converges at a rate of $O(1/T)$.
+%	\end{block}
+%	\pause
+%	\begin{align*}
+%	\onslide<2->{&\text{Our previous observation: } \| \vec{u}^t - \vec{u}^{t-1} \|_*
+%	\leq \sum_{j\neq i} \| \vec{\mst}_j^t-\vec{\mst}_j^{t-1}\|\\
+%	&\sum_{i\in N} \|\vec{u}_i^t-\vec{u}_i^{t-1}\|_*^2
+%	\leq \sum_{i\in N} \left(\sum_{j\neq i} \| \vec{\mst}_j^t-\vec{\mst}_j^{t-1}\|\right)^2 \\}
+%	\onslide<3->{&\leq \sum_{i\in N}  \left((n-1) \sum_{j\neq i} \| \vec{\mst}_j^t-
+%	\vec{\mst}_j^{t-1}\|^2 \right)
+%	= (n-1)^2 \sum_{i\in N} \| \vec{\mst}_i^t-
+%	\vec{\mst}_i^{t-1}\|^2}
+%	\end{align*}
+%
+%  \end{frame}
+%  
+%    \begin{frame}
+%    	\frametitle{Proof, continued}
+%    	
+%
+%    	\begin{align*}
+%    	\onslide<1->{\sum_{i\in N} r_i(T) &\leq 
+%    	\alert<2>{\sum_{i\in N}} \left( \alpha
+%    	+\beta \alert<2>{\sum_{t=1}^{T}} \| \vec{u}^t_i - \vec{u}^{t-1}_i\|_*^2 -
+%    	\gamma\sum_{t=1}^{T} \|\vec{w}^{t}_i - \vec{w}^{t-1}_i \|^2 \right)\\}
+%    	\onslide<2->{&=\alpha n + \sum_{t=1}^{T} \left( \beta \alert<3>{\sum_{i\in N} \| \vec{u}^t_i - \vec{u}^{t-1}_i\|_*^2}
+%    	- \gamma \sum_{i\in N} \|\vec{w}^{t}_i - \vec{w}^{t-1}_i \|^2  \right)\\}
+%    	\onslide<3->{\leq \alpha &n + \sum_{t=1}^{T} \left( \beta (n-1)^2 \sum_{i\in N} \| \vec{\mst}_i^t-
+%    	\vec{\mst}_i^{t-1}\|^2
+%    	- \gamma  \sum_{i\in N} \|\vec{w}^{t}_i - \vec{w}^{t-1}_i \|^2  \right)\\}
+%    	\onslide<4->{&\leq \alpha n + \sum_{t=1}^{T} \left( \left(  \alert<5>{\beta} (n-1)^2 
+%    	- \gamma \right)  \sum_{i\in N}\|\vec{w}^{t}_i - \vec{w}^{t-1}_i \|^2 \right)\\}
+%    	\onslide<5->{&\leq \alpha n + \sum_{t=1}^{T} \left( \left(  \frac{\gamma}{(n-1)^2}  (n-1)^2 
+%    	- \gamma \right)  \sum_{i\in N}\|\vec{w}^{t}_i - \vec{w}^{t-1}_i \|^2 \right)\\
+%    	&\leq \alpha n}
+%    	\end{align*}
+%    	
+%    \end{frame}
+%  
+%  \begin{frame}
+%  	\frametitle{Proof result}
+%  	\begin{itemize}
+%  		\item Average regret vanishes at the rate of $O(1/T)$.
+%  		
+%  		\item For a smooth game the social welfare reaches the approximate optimum.
+%  		
+%  	\end{itemize}
+%  	
+%  \end{frame}
+%  
+%\section[OFRL]{Recency bias} % a lot
+%
+%\begin{frame}
+%	\frametitle{Optimistic Follow the Regularized Leader}
+%	\begin{block}{Optimistic Follow the Regularized Leader}
+%		Let $\mR$ be a 1-strongly convex regularizer and\\
+%		$\vec{M}_i^T$ be an adaptive prediction sequence:
+%	\begin{equation*}
+%	\vec{\mst}_i^T
+%	= \argmax_{\vec{\mst} \in \Delta(S_i)} \dotp{\vec{\mst}}{\sum_{t=1}^{T-1} \vec{u}_i^t
+%		+ \vec{M}_i^T}-\frac{\mR(\vec{\mst})}{\eta}.
+%	\end{equation*}
+%	\end{block}
+%	\pause
+%	\begin{block}{One-step recency bias}
+%		With $\vec{M}_i^t = \vec{u}_i^{t-1}$ and using stepsize $\eta$, OFRL satisfies the \myprop~ property 
+%		 with constants
+%			$\alpha = R/\eta$, $\beta = \eta$ and $\gamma
+%			= 1/(4\eta)$\\
+%		where $R = \max_i \left(\sup_{\vec{f}\in \Delta(S_i)} \mR(\vec{f})-\inf_{\vec{f}\in \Delta(S_i)}\mR(\vec{f})\right)$.
+%		
+%	\end{block}
+%	
+%\end{frame}
+%
+%%\section{Robustness against adversary}
+%
+%\section{Experiment}
+%% fast convergence, stable and better equilibrium (higher welfare)
+%\subsection{Experimental setting}
+%\begin{frame}
+%	\frametitle{The experiment}
+%	\begin{itemize}
+%		\item 4 bidders
+%		\item 4 items each worth 20
+%		\item each bidder has no extra value from more than one item
+%		\item bids are integers in [1,20]
+%		\item in every round each bidder only bids for one item 
+%		\item highest bid wins and must be paid
+%		\item ties are broken arbitrarily 
+%	\end{itemize}
+%\end{frame}
+%
+%\subsection{Results I}
+%\begin{frame}
+%	\frametitle{Results I}
+%	\begin{figure}[!t]
+%		\centering
+%		\subfigure{
+%			\includegraphics[width=0.4\textwidth,height=0.3\textwidth]{sum_regret.pdf}
+%		}
+%		\quad
+%		\subfigure{
+%			\includegraphics[width=0.4\textwidth,height=0.3\textwidth]{max_regret.pdf}
+%		}
+%		\caption{Maximum and sum of individual regrets over time under the
+%			Hedge (blue) and \mbox{Optimistic Hedge} (red) dynamics.}\label{fig:regrets}
+%	\end{figure}
+%\end{frame}
+%
+%\subsection{Results II}
+%\begin{frame}
+%	\frametitle{Results II}
+%	\begin{figure}[!t]
+%		\centering
+%		\subfigure{
+%			\includegraphics[width=0.4\textwidth,height=0.3\textwidth]{expected_bid.pdf}
+%		}
+%		\quad
+%		\subfigure{
+%			\includegraphics[width=0.4\textwidth,height=0.3\textwidth]{utilities.pdf}
+%		}
+%		\caption{Expected bid and per-iteration utility of a player on one of
+%			the four items over time, under Hedge (blue) and {Optimistic Hedge}
+%			(red) dynamics.}\label{fig:bids}
+%	\end{figure}
+%\end{frame}
+%\section{Discussion}
+%\subsection{Discussion}
+%\begin{frame}
+%	\frametitle{Discussion}
+%	\begin{itemize}
+%		\item Is \myprop~ necessary? (probably not)
+%		\item Is observing only the other's players moves instead of the expected utilities also enough to get faster rates?
+%		\item A precise quantification of the desired behaviour, which is necessary for stable trajectories, is of great interest.
+%	\end{itemize}
+%\end{frame}
+%
+%
+
+
+
+
+
+\begin{frame}
 	
 \end{frame}
 
-%\section{Robustness against adversary}
+% backup slides
 
-\section{Experiment}
-% fast convergence, stable and better equilibrium (higher welfare)
-\subsection{Experimental setting}
-\begin{frame}
-	\frametitle{The experiment}
-	\begin{itemize}
-		\item 4 bidders
-		\item 4 items each worth 20
-		\item each bidder has no extra value from more than one item
-		\item bids are integers in [1,20]
-		\item in every round each bidder only bids for one item 
-		\item highest bid wins and must be paid
-		\item ties are broken arbitrarily 
-	\end{itemize}
-\end{frame}
+%TODO: add FTL unstable example to backup slides (notes 154)
 
-\subsection{Results I}
-\begin{frame}
-	\frametitle{Results I}
-	\begin{figure}[!t]
-		\centering
-		\subfigure{
-			\includegraphics[width=0.4\textwidth,height=0.3\textwidth]{sum_regret.pdf}
-		}
-		\quad
-		\subfigure{
-			\includegraphics[width=0.4\textwidth,height=0.3\textwidth]{max_regret.pdf}
-		}
-		\caption{Maximum and sum of individual regrets over time under the
-			Hedge (blue) and \mbox{Optimistic Hedge} (red) dynamics.}\label{fig:regrets}
-	\end{figure}
-\end{frame}
 
-\subsection{Results II}
-\begin{frame}
-	\frametitle{Results II}
-	\begin{figure}[!t]
-		\centering
-		\subfigure{
-			\includegraphics[width=0.4\textwidth,height=0.3\textwidth]{expected_bid.pdf}
-		}
-		\quad
-		\subfigure{
-			\includegraphics[width=0.4\textwidth,height=0.3\textwidth]{utilities.pdf}
-		}
-		\caption{Expected bid and per-iteration utility of a player on one of
-			the four items over time, under Hedge (blue) and {Optimistic Hedge}
-			(red) dynamics.}\label{fig:bids}
-	\end{figure}
-\end{frame}
-\section{Discussion}
-\subsection{Discussion}
-\begin{frame}
-	\frametitle{Discussion}
-	\begin{itemize}
-		\item Is \myprop~ necessary? (probably not)
-		\item Is observing only the other's players moves instead of the expected utilities also enough to get faster rates?
-		\item A precise quantification of the desired behaviour, which is necessary for stable trajectories, is of great interest.
-	\end{itemize}
-\end{frame}
-% is RVU needed? probably not
+
+
 
 \end{document}
