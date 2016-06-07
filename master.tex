@@ -20,7 +20,9 @@
 \usepackage{graphicx}
 \usepackage{subfigure}
 \hypersetup{pdfstartview={Fit}}
+\usepackage{xparse}
 \usepackage{soul}
+\usepackage{xcolor}
 
 \newcommand{\E}{\mathbb{E}}
 \newcommand{\abs}[1]{\vert{#1}\vert}
@@ -52,7 +54,23 @@
 }
 
 
-
+\makeatletter
+\NewDocumentCommand{\sotwo}{O{red}O{black}+m}
+{%
+	\begingroup
+	\color{#1}%
+	\setul{-.5ex}{.4pt}%
+	\def\SOUL@uleverysyllable{%
+		\rlap{%
+			\color{#2}\the\SOUL@syllable
+			\SOUL@setkern\SOUL@charkern}%
+		\SOUL@ulunderline{%
+			\phantom{\the\SOUL@syllable}}%
+	}%
+	\ul{#3}%
+	\endgroup
+}
+\makeatother
 
 
 \title{Fast Convergence of Regularized Learning in Games}
@@ -235,8 +253,46 @@
 		\Huge Games
 	\end{center}
 \end{frame}
-% Games
-  % matching pennies
+
+\subsection{Matching pennies}
+\begin{frame}[c]
+		\frametitle{Matching pennies}
+	\begin{center}
+		
+		
+		\begin{tabular}{c||c|c}
+			$A\diagdown B$ & Heads & Tails \\ \hline \hline
+			Heads & $1\diagdown -1$ & $-1\diagdown 1$ \\ \hline
+			Tails & $-1\diagdown 1$ & $1\diagdown -1$
+		\end{tabular} 
+	\end{center}
+		\pause
+		
+		\vspace{1em}
+		Each player has to chose one of the possible strategies $S = \left\lbrace \text{Heads}, \text{Tails} \right\rbrace$. \\ \pause
+		In each round the players \sotwo[red]{suffer loss} gain utility.\\ \pause
+		\vspace{1em}
+		Each player wants to maximize his accumulated utility.
+\end{frame}
+
+
+
+\subsection{Game model}
+\begin{frame}
+	\frametitle{Game}
+	For a game G of $n$ players:\\
+	Each player $i$ has 
+	\begin{itemize}
+		\item a finite strategy space $S_i$ and a
+		\item utility function $u_i : S_1 \times \ldots \times S_n \rightarrow [0,1]$.
+	\end{itemize}\pause
+	\vspace{1em}
+	In each round t:\\
+	The player chooses a \sotwo[red]{strategy} mixed strategy $\vec{w}^t_i$ to play. \\ \pause
+	Then the player receives $u^t$, the expected utility for each of his strategies $x$: $\mathbf{u}^t_i = (u^t_{i,x})_{x \in S_i} $ with $ u^t_{i,x} = \mathbb{E}_{s_{-i} \sim w^t_{-i}} \left[u_i(x,s_{-i})\right] $ \pause \\
+	The expected utility for a player $i$ in iteration $t$ is therefore  $ \left\langle w^t_{i},u^t_{i}\right\rangle $.
+	
+\end{frame}
   % theoretical model
   % played against adversarial environment
 
@@ -268,8 +324,6 @@
 
 
 \subsection{\myprop~ property}
-% what do the terms mean
-
 \begin{frame}
 	\frametitle{\myprop~ property}
 	\begin{block}{\myprop~ -- Regret bounded by Variation in Utilities}
@@ -284,8 +338,7 @@
 
 \end{frame}
 
-%\section[Social welfare]{Fast convergence of social welfare}
-  \subsection{All players' average regret} %with proof
+  \subsection{All players' average regret}
   \begin{frame}
   	\frametitle{All players' average regret}
 	
@@ -385,7 +438,7 @@
 		\end{block}
 \end{frame}
 
-\subsection{Other contributions} %with proof
+\subsection{Other contributions}
 \begin{frame}
  	\frametitle{Other contributions}
  	
