@@ -241,19 +241,39 @@
   % played against adversarial environment
 
 
-\section{Playing under nice conditions}
-% two players zero-sum games
 
-% RVU property
-% when played against each other
-% bound + proof
-\subsection{RVU property}
+
+
+\section{Playing under nice conditions}
+\begin{frame}[c]
+	\begin{center}
+		\Huge Playing under nice conditions
+	\end{center}
+\end{frame}
+\subsection{Nice opponents}
+\begin{frame}
+	\frametitle{Nice opponents}
+%	\begin{block}{}
+%
+%	\end{block}
+	Assume all players to use no-regret algorithms.\\ \pause
+	\vspace{1em} 
+	For two-player zero-sum games each player's average regret converges at the rate of $O(1/T)$ instead of $O(1/\sqrt{T})$.\\ \pause
+	\vspace{1em}
+	\begin{beamercolorbox}[sep=1em]{postit}
+		Can this be generalized?
+	\end{beamercolorbox}
+	
+\end{frame}
+
+
+\subsection{\myprop~ property}
 % what do the terms mean
 
 \begin{frame}
-	\frametitle{RVU property}
-	\begin{block}{RVU -- Regret bounded by Variation in Utilities}
-		A vanishing regret algorithm has the RVU property with parameters $\alpha>0$ and $0<\beta\leq\gamma$  if for any sequence of utilities $\vec{u}^1, \vec{u}^2, \ldots, \vec{u}^T$ the regret is bounded as 
+	\frametitle{\myprop~ property}
+	\begin{block}{\myprop~ -- Regret bounded by Variation in Utilities}
+		A vanishing regret algorithm has the \myprop~ property with parameters $\alpha>0$ and $0<\beta\leq\gamma$  if for any sequence of utilities $\vec{u}^1, \vec{u}^2, \ldots, \vec{u}^T$ the regret is bounded as 
 		\begin{equation*}
 		r(T) \leq \alpha
 		+\beta \sum_{t=1}^{T} \max_{x \in S_i} \left| u_{i,x}^t - u_{i,x}^{t-1} \right|_1^2 -
@@ -265,15 +285,15 @@
 \end{frame}
 
 %\section[Social welfare]{Fast convergence of social welfare}
-  \subsection{All player's average regret} %with proof
+  \subsection{All players' average regret} %with proof
   \begin{frame}
-  	\frametitle{All player's average regret}
+  	\frametitle{All players' average regret}
 	
-	\begin{block}{Fast convergence of all player's average regret}
+	\begin{block}{Fast convergence of all players' average regret}
 		Suppose that the algorithm of each player $i$ satisfies the \myprop~property
 		with parameters $\alpha, \beta$ and $\gamma$ such that \textcolor{olive}{
 		$\beta\leq \gamma/(n-1)^2$}. \\
-		Then $\sum_{i\in N} r_i(T) \leq \alpha n$ and therefore all player's average regret converges at a rate of $O(1/T)$.
+		Then $\sum_{i\in N} r_i(T) \leq \alpha n$ and therefore all players' average regret converges at a rate of $O(1/T)$.
 	\end{block}
 	\pause
 
@@ -281,9 +301,9 @@
     	\onslide<2->{\sum_{i\in N} r_i(T) &\leq 
     	\alert<3>{\sum_{i\in N}} \left( \alpha
     	+\beta \alert<3>{\sum_{t=1}^{T}} \max_{x \in S_i} \left| u_{i,x}^t - u_{i,x}^{t-1} \right|^2 -
-    	\gamma\alert<3>{\sum_{t=1}^{T}} \left\|\vec{w}^{t} - \vec{w}^{t-1}\right\|^2_1 \right)\\}
+    	\gamma\alert<3>{\sum_{t=1}^{T}} \left\|\vec{w}^{t}_i - \vec{w}^{t-1}_i\right\|^2_1 \right)\\}
     	\onslide<3->{&=\alpha n + \sum_{t=1}^{T} \left( \beta \alert<4>{\sum_{i\in N}  \max_{x \in S_i} \left| u_{i,x}^t - u_{i,x}^{t-1} \right|^2}
-    	- \gamma \alt<4>{\textcolor{blue}{\sum_{i\in N} \left\|\vec{w}^{t} - \vec{w}^{t-1}\right\|^2_1}}{\textcolor{black}{\sum_{i\in N} \left\|\vec{w}^{t} - \vec{w}^{t-1}\right\|^2_1}}  \right)}
+    	- \gamma \alt<4>{\textcolor{blue}{\sum_{i\in N} \left\|\vec{w}^{t}_i - \vec{w}^{t-1}_i\right\|^2_1}}{\textcolor{black}{\sum_{i\in N} \left\|\vec{w}^{t} - \vec{w}^{t-1}\right\|^2_1}}  \right)}
     	\end{align*}
 
 
@@ -301,8 +321,8 @@
 	   \onslide<6->{\leq \sum_{j\neq i} \|
 	   \vec{\mst}_j^t-\vec{\mst}_j^{t-1}\|}\\
 		\onslide<7->{\Rightarrow &\textcolor{red}{\sum_{i\in N} \max_{x \in S_i} \left| u_{i,x}^t - u_{i,x}^{t-1} \right|^2}
-		\leq (n-1)^2 \textcolor{blue}{\sum_{i\in N} \| \vec{\mst}_i^t-
-		\vec{\mst}_i^{t-1}\|^2}}
+		\leq (n-1)^2 \textcolor{blue}{\sum_{i\in N} \left\| \vec{\mst}_i^t-
+		\vec{\mst}_i^{t-1}\right\|^2_1}}
 	\end{align*}
 \end{frame}
 
@@ -323,36 +343,152 @@
 \end{frame}
 
 
+\subsection{Optimistic Follow the Regularized Leader}
+
+\begin{frame}
+	\frametitle{Optimistic Follow the Regularized Leader}
+	\begin{block}{Optimistic Follow the Regularized Leader}
+		Let $\mR$ be a suitable regularizer and\\
+		$\vec{M}_i^T$ be an adaptive prediction sequence:
+	\begin{equation*}
+	\vec{\mst}_i^T
+	= \argmax_{\vec{\mst} \in \Delta(S_i)} \dotp{\vec{\mst}}{\left(\sum_{t=1}^{T-1} \vec{u}_i^t\right)
+		+ \vec{M}_i^T}-\frac{\mR(\vec{\mst})}{\eta}.
+	\end{equation*}
+	\end{block}
+	\pause
+	
+	\begin{block}{Recency bias}
+		\textit{Optimistic Follow the Regularized Leader} has the \myprop~ property with\\
+		\begin{itemize}
+			\item one-step recency bias $\vec{M}_i^t = \vec{u}_i^{t-1}$
+			\item $H$-step recency bias $\vec{M}_i^t = \sum_{\tau = t-H}^{t-1} \vec{u}_i^\tau/H$
+			\item geometrically discounted recency bias $\vec{M}_i^t
+			= \frac{1}{\sum_{\tau = 0}^{t-1} \delta^{-\tau}} \sum_{\tau =
+				0}^{t-1} \delta^{-\tau} \vec{u}_i^\tau$
+		\end{itemize}
+		
+		
+	\end{block}
+	
+\end{frame}
+
+\begin{frame}
+		
+		\begin{block}{One-step recency bias}
+			With $\vec{M}_i^t = \vec{u}_i^{t-1}$ and using stepsize $\eta$, \textit{Optimistic Follow the Regularized Leader} satisfies the \myprop~ property 
+			with constants
+			$\alpha = R/\eta$, $\beta = \eta$ and $\gamma
+			= 1/(4\eta)$\\
+			where $R = \max_i \left(\sup_{\vec{f}\in \Delta(S_i)} \mR(\vec{f})-\inf_{\vec{f}\in \Delta(S_i)}\mR(\vec{f})\right)$.
+			
+		\end{block}
+\end{frame}
+
+\subsection{Other contributions} %with proof
+\begin{frame}
+ 	\frametitle{Other contributions}
+ 	
+ 	
+ 	\begin{block}{Meta-algorithm}
+ 		They show a meta-algorithm that uses any \myprop~satisfying algorithm and uses it so that
+ 		the \myprop~property is preserved but also against adversarial environments the worst case rate is $O(1/\sqrt{T})$.
+ 	\end{block}
+ 	\pause
+ 	
+ 	\begin{block}{Fast convergence of each player's average regret}
+ 		If either all players use \\
+ 		\begin{itemize}
+  		\item \textit{Optimistic Follow the Regularized Leader} with $\vec{M}_i^t = \vec{u}_i^{t-1}$ or
+ 			\item all use the meta-algorithm with the same input algorithm
+ 		\end{itemize}
+ 		then each player's average regret converges at the rate of $ O(T^{-3/4})$.
+ 	\end{block}
+ 	
+\end{frame}
 
 
 
 
 
-% OFRL
-% recency bias
+
 
 % social welfare
 % smooth games
 
-% each player's average regret
 
-% blackbox reduction 
+\section{Experimental validation}
+\begin{frame}[c]
+	\begin{center}
+		\Huge Experimental validation
+	\end{center}
+\end{frame}
+\subsection{The experiment}
+\begin{frame}
+	\frametitle{Results I}
+	\begin{figure}[!t]
+		\centering
+		\subfigure{
+			\includegraphics[width=0.45\textwidth,height=0.3\textwidth]{sum_regret.pdf}
+		}
+		\quad
+		\subfigure{
+			\includegraphics[width=0.45\textwidth,height=0.3\textwidth]{max_regret.pdf}
+		}
+		\caption{Maximum and sum of individual regrets over time under the
+			Hedge (blue) and \mbox{Optimistic Hedge} (red) dynamics.}\label{fig:regrets}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Results II}
+	\begin{figure}[!t]
+		\centering
+		\subfigure{
+			\includegraphics[width=0.45\textwidth,height=0.3\textwidth]{expected_bid.pdf}
+		}
+		\quad
+		\subfigure{
+			\includegraphics[width=0.45\textwidth,height=0.3\textwidth]{utilities.pdf}
+		}
+		\caption{Expected bid and per-iteration utility of a player on one of
+			the four items over time, under Hedge (blue) and {Optimistic Hedge}
+			(red) dynamics.}\label{fig:bids}
+	\end{figure}
+\end{frame}
 
 
-% experiment
-
-% results + discussion
 
 
+\section{Discussion}
+\subsection{Discussion}
+\begin{frame}
+	\frametitle{Results}
+		\begin{itemize}
+			\item When all players use no-regret algorithms with \myprop~property: All players' average regret converges at rate $O(1/T)$ instead of $O(1/\sqrt{T})$.
+			\item Stability and recency bias are key ingredients for fast converging algorithms, for which \textit{Optimistic Follow the Regularized Leader} is an example.
+			\item Every no-regret algorithm with \myprop~property can be used by a meta-algorithm that than also satisfies the \myprop~property and guarantees a worst case rate of $O(1/\sqrt{T})$.
+			\item When all players use the same algorithm chosen from OFRL with $\vec{M}_i^t = \vec{u}_i^{t-1}$ or the meta-algorithm with the same input algorithm: Each player's individual regret converges at rate $O(T^{-3/4})$ instead of $O(1/\sqrt{T})$.
+		\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Discussion}
+		\begin{itemize}
+			\item Is \myprop~ necessary? (probably not)
+			\item Is observing only the other's players moves instead of the expected utilities also enough to get faster rates?
+			\item A precise quantification of the desired behaviour, which is necessary for stable trajectories for $\vec{\mst}_i$, is of great interest.
+		\end{itemize}
+\end{frame}
 
 
 
-
+\section{}
 
 
 
 \begin{frame}
-	Placeholder
+	
 \end{frame}
 
 
@@ -612,95 +748,8 @@
 %
 %
 %
-%\section[A class of no-regret dynamics]{A special class of no-regret dynamics}
-%\subsection{RVU property}
-%% what do the terms mean
-%
-%\begin{frame}
-%	\frametitle{RVU property}
-%	\begin{block}{RVU -- Regret bounded by Variation in Utilities}
-%		A vanishing regret algorithm has the RVU property with parameters $\alpha>0$ and $0<\beta\leq\gamma$ and a pair of dual norms $(\|\cdot\|, \|\cdot\|_*)$ if for any sequence of utilities $\vec{u}^1, \vec{u}^2, \ldots, \vec{u}^T$ the regret is bounded as 
-%		\begin{equation*}
-%		\sum_{t=1}^{T} \dotp{\vec{w}^*- \vec{w}^t}{\vec{u}^t} \leq \alpha
-%		+\beta \sum_{t=1}^{T} \| \vec{u}^t - \vec{u}^{t-1}\|_*^2 -
-%		\gamma\sum_{t=1}^{T} \|\vec{w}^{t} - \vec{w}^{t-1}\|^2
-%		\end{equation*}  
-%	\end{block}
-%	
-%	\begin{block}{Dual to a norm}
-%		The dual to a norm
-%		$\|\cdot\|$ is defined as $\|u\|_* = \sup_{\|w\| \leq 1}
-%		\dotp{w}{u}$.
-%	\end{block}
-%\end{frame}
-%
-%\subsection{The middle term}
-%% explain dual norm -> max
-%
-%\begin{frame}
-%	\frametitle{An observation on $ \| \vec{u}^t - \vec{u}^{t-1}\|_*^2 $}
-%	We will now use the $\ell_1$ norm.
-%	
-%	\begin{align*}
-%		\onslide<1->{&\| \vec{u}^t_i - \vec{u}^{t-1}_i \|_*
-%	   =\sup_{\|w\| \leq 1} \dotp{w}{\vec{u}^t_i - \vec{u}^{t-1}_i} 
-%	   =\max_{x \in S_i} \left| u_{i,x}^t - u_{i,x}^{t-1} \right|  \\}
-%	   \onslide<2->{=&\max_{x \in S_i} \left| \E_{\vec{s}_{-i}\sim \vec{w}_{-i}^t}[u_i(x,\vec{s}_{-i})] - \E_{\vec{s}_{-i}\sim \vec{w}_{-i}^{t-1}} [u_i(x,\vec{s}_{-i})] \right| \\}
-%	   \onslide<3->{=&\max_{x \in S_i} \left| \sum_{\tilde{s} \in \vec{s}_{-i}} u_i(x,\tilde{s}) \left( \text{Prob}^t(\tilde{s}) - \text{Prob}^{t-1}(\tilde{s})\right)   \right|\\}
-%	   \onslide<4->{\leq&\max_{x \in S_i} \sum_{\tilde{s} \in \vec{s}_{-i}} u_i(x,\tilde{s})  \left| ( \text{Prob}^t(\tilde{s}) - \text{Prob}^{t-1}(\tilde{s}))   \right|\\}
-%	   \onslide<5->{\leq& \sum_{\tilde{s} \in \vec{s}_{-i}} \left| \prod_{j\neq i} \mst_{j,\tilde{s}_j}^t - \prod_{j\neq i}\mst_{j,\tilde{s}_j}^{t-1}\right| }
-%	   \onslide<6->{\leq \sum_{j\neq i} \|
-%	   \vec{\mst}_j^t-\vec{\mst}_j^{t-1}\|}
-%	\end{align*}
-%\end{frame}
-%
-%\section[Social welfare]{Fast convergence of social welfare}
-%  \subsection{Theorem 4} %with proof
-%  \begin{frame}
-%  	\frametitle{Fast convergence of social welfare}
-%	
-%	\begin{block}{Fast convergence of social welfare}
-%		Suppose that the algorithm of each player $i$ satisfies the \myprop~property
-%		with parameters $\alpha, \beta$ and $\gamma$ such that
-%		$\beta\leq \gamma/(n-1)^2$ and $\|\cdot\| = \|\cdot\|_1$. \\
-%		Then $\sum_{i\in N} r_i(T) \leq \alpha n$ and therefore the social welfare converges at a rate of $O(1/T)$.
-%	\end{block}
-%	\pause
-%	\begin{align*}
-%	\onslide<2->{&\text{Our previous observation: } \| \vec{u}^t - \vec{u}^{t-1} \|_*
-%	\leq \sum_{j\neq i} \| \vec{\mst}_j^t-\vec{\mst}_j^{t-1}\|\\
-%	&\sum_{i\in N} \|\vec{u}_i^t-\vec{u}_i^{t-1}\|_*^2
-%	\leq \sum_{i\in N} \left(\sum_{j\neq i} \| \vec{\mst}_j^t-\vec{\mst}_j^{t-1}\|\right)^2 \\}
-%	\onslide<3->{&\leq \sum_{i\in N}  \left((n-1) \sum_{j\neq i} \| \vec{\mst}_j^t-
-%	\vec{\mst}_j^{t-1}\|^2 \right)
-%	= (n-1)^2 \sum_{i\in N} \| \vec{\mst}_i^t-
-%	\vec{\mst}_i^{t-1}\|^2}
-%	\end{align*}
-%
-%  \end{frame}
-%  
-%    \begin{frame}
-%    	\frametitle{Proof, continued}
-%    	
-%
-%    	\begin{align*}
-%    	\onslide<1->{\sum_{i\in N} r_i(T) &\leq 
-%    	\alert<2>{\sum_{i\in N}} \left( \alpha
-%    	+\beta \alert<2>{\sum_{t=1}^{T}} \| \vec{u}^t_i - \vec{u}^{t-1}_i\|_*^2 -
-%    	\gamma\sum_{t=1}^{T} \|\vec{w}^{t}_i - \vec{w}^{t-1}_i \|^2 \right)\\}
-%    	\onslide<2->{&=\alpha n + \sum_{t=1}^{T} \left( \beta \alert<3>{\sum_{i\in N} \| \vec{u}^t_i - \vec{u}^{t-1}_i\|_*^2}
-%    	- \gamma \sum_{i\in N} \|\vec{w}^{t}_i - \vec{w}^{t-1}_i \|^2  \right)\\}
-%    	\onslide<3->{\leq \alpha &n + \sum_{t=1}^{T} \left( \beta (n-1)^2 \sum_{i\in N} \| \vec{\mst}_i^t-
-%    	\vec{\mst}_i^{t-1}\|^2
-%    	- \gamma  \sum_{i\in N} \|\vec{w}^{t}_i - \vec{w}^{t-1}_i \|^2  \right)\\}
-%    	\onslide<4->{&\leq \alpha n + \sum_{t=1}^{T} \left( \left(  \alert<5>{\beta} (n-1)^2 
-%    	- \gamma \right)  \sum_{i\in N}\|\vec{w}^{t}_i - \vec{w}^{t-1}_i \|^2 \right)\\}
-%    	\onslide<5->{&\leq \alpha n + \sum_{t=1}^{T} \left( \left(  \frac{\gamma}{(n-1)^2}  (n-1)^2 
-%    	- \gamma \right)  \sum_{i\in N}\|\vec{w}^{t}_i - \vec{w}^{t-1}_i \|^2 \right)\\
-%    	&\leq \alpha n}
-%    	\end{align*}
-%    	
-%    \end{frame}
+
+
 %  
 %  \begin{frame}
 %  	\frametitle{Proof result}
@@ -738,7 +787,24 @@
 %	
 %\end{frame}
 %
-%%\section{Robustness against adversary}
+
+
+%
+
+
+
+
+
+
+% backup slides
+
+\begin{frame}
+	
+\end{frame}
+
+%TODO: add FTL unstable example to backup slides (notes 154)
+
+
 %
 %\section{Experiment}
 %% fast convergence, stable and better equilibrium (higher welfare)
@@ -756,67 +822,5 @@
 %	\end{itemize}
 %\end{frame}
 %
-%\subsection{Results I}
-%\begin{frame}
-%	\frametitle{Results I}
-%	\begin{figure}[!t]
-%		\centering
-%		\subfigure{
-%			\includegraphics[width=0.4\textwidth,height=0.3\textwidth]{sum_regret.pdf}
-%		}
-%		\quad
-%		\subfigure{
-%			\includegraphics[width=0.4\textwidth,height=0.3\textwidth]{max_regret.pdf}
-%		}
-%		\caption{Maximum and sum of individual regrets over time under the
-%			Hedge (blue) and \mbox{Optimistic Hedge} (red) dynamics.}\label{fig:regrets}
-%	\end{figure}
-%\end{frame}
-%
-%\subsection{Results II}
-%\begin{frame}
-%	\frametitle{Results II}
-%	\begin{figure}[!t]
-%		\centering
-%		\subfigure{
-%			\includegraphics[width=0.4\textwidth,height=0.3\textwidth]{expected_bid.pdf}
-%		}
-%		\quad
-%		\subfigure{
-%			\includegraphics[width=0.4\textwidth,height=0.3\textwidth]{utilities.pdf}
-%		}
-%		\caption{Expected bid and per-iteration utility of a player on one of
-%			the four items over time, under Hedge (blue) and {Optimistic Hedge}
-%			(red) dynamics.}\label{fig:bids}
-%	\end{figure}
-%\end{frame}
-%\section{Discussion}
-%\subsection{Discussion}
-%\begin{frame}
-%	\frametitle{Discussion}
-%	\begin{itemize}
-%		\item Is \myprop~ necessary? (probably not)
-%		\item Is observing only the other's players moves instead of the expected utilities also enough to get faster rates?
-%		\item A precise quantification of the desired behaviour, which is necessary for stable trajectories, is of great interest.
-%	\end{itemize}
-%\end{frame}
-%
-%
-
-
-
-
-
-\begin{frame}
-	
-\end{frame}
-
-% backup slides
-
-%TODO: add FTL unstable example to backup slides (notes 154)
-
-
-
-
 
 \end{document}
