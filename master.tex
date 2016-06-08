@@ -240,7 +240,7 @@
 	\end{itemize}
 	
 	\begin{block}{Follow the Regularized Leader}
-		\textit{Follow the Regularized Leader} is a no-regret algorithm with $r(T)\in O(\sqrt(T))$.
+		\textit{Follow the Regularized Leader} is a no-regret algorithm with $r(T)\in O(\sqrt{T})$.
 	\end{block}
 \end{frame}
 
@@ -289,7 +289,7 @@
 	\vspace{1em}
 	In each round t:\\
 	The player chooses a \sotwo[red]{strategy} mixed strategy $\vec{w}^t_i$ to play. \\ \pause
-	Then the player receives $u^t$, the expected utility for each of his strategies $x$: $\mathbf{u}^t_i = (u^t_{i,x})_{x \in S_i} $ with $ u^t_{i,x} = \mathbb{E}_{s_{-i} \sim w^t_{-i}} \left[u_i(x,s_{-i})\right] $ \pause \\
+	Then the player receives $\mathbf{u}^t_i$, the expected utility for each of his strategies $x$: $\mathbf{u}^t_i = (u^t_{i,x})_{x \in S_i} $ with $ u^t_{i,x} = \mathbb{E}_{s_{-i} \sim w^t_{-i}} \left[u_i(x,s_{-i})\right] $ \pause \\
 	The expected utility for a player $i$ in iteration $t$ is therefore  $ \left\langle w^t_{i},u^t_{i}\right\rangle $.
 	
 \end{frame}
@@ -444,8 +444,8 @@
  	
  	
  	\begin{block}{Meta-algorithm}
- 		They show a meta-algorithm that uses any \myprop~satisfying algorithm and uses it so that
- 		the \myprop~property is preserved but also against adversarial environments the worst case rate is $O(1/\sqrt{T})$.
+ 		They show a meta-algorithm that uses any tunable algorithm that satisfies the \myprop~property so that
+ 		the \myprop~property is preserved but also that the worst case rate against adversarial environments is $O(1/\sqrt{T})$.
  	\end{block}
  	\pause
  	
@@ -453,7 +453,7 @@
  		If either all players use \\
  		\begin{itemize}
   		\item \textit{Optimistic Follow the Regularized Leader} with $\vec{M}_i^t = \vec{u}_i^{t-1}$ or
- 			\item all use the meta-algorithm with the same input algorithm
+ 			\item all use the meta-algorithm with the same input algorithm that satisfies a certain stability condition
  		\end{itemize}
  		then each player's average regret converges at the rate of $ O(T^{-3/4})$.
  	\end{block}
@@ -518,10 +518,10 @@
 \begin{frame}
 	\frametitle{Results}
 		\begin{itemize}
-			\item When all players use no-regret algorithms with \myprop~property: All players' average regret converges at rate $O(1/T)$ instead of $O(1/\sqrt{T})$.
-			\item Stability and recency bias are key ingredients for fast converging algorithms, for which \textit{Optimistic Follow the Regularized Leader} is an example.
-			\item Every no-regret algorithm with \myprop~property can be used by a meta-algorithm that than also satisfies the \myprop~property and guarantees a worst case rate of $O(1/\sqrt{T})$.
-			\item When all players use the same algorithm chosen from OFRL with $\vec{M}_i^t = \vec{u}_i^{t-1}$ or the meta-algorithm with the same input algorithm: Each player's individual regret converges at rate $O(T^{-3/4})$ instead of $O(1/\sqrt{T})$.
+			\item When all players use no-regret algorithms with \myprop~property: \textbf{All players' average regret} converges at rate $O(1/T)$ instead of $O(1/\sqrt{T})$. \pause
+			\item \textbf{Stability} and \textbf{recency bias} are key ingredients for fast converging algorithms, for which \textit{Optimistic Follow the Regularized Leader} is an example. \pause
+			\item Every tunable no-regret algorithm with the \myprop~property can be used by a \textbf{meta-algorithm} that than also satisfies the \myprop~property and guarantees a worst case rate of $O(1/\sqrt{T})$. \pause
+			\item When all players use the same algorithm chosen from OFRL with $\vec{M}_i^t = \vec{u}_i^{t-1}$ or the meta-algorithm with the same input algorithm that satisfies the stability condition: Each player's \textbf{individual regret} converges at rate $O(T^{-3/4})$ instead of $O(1/\sqrt{T})$.
 		\end{itemize}
 \end{frame}
 
