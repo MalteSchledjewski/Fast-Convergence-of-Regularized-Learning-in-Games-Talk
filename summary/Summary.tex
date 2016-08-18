@@ -9,7 +9,7 @@
 \usepackage[stretch=10]{microtype} % improves font placements
 %\usepackage{graphicx}
 \usepackage[breaklinks, colorlinks
-%, citecolor=black, filecolor=black, linkcolor=black, urlcolor=black ,pdfborder=0
+, citecolor=black, filecolor=black, linkcolor=black, urlcolor=black ,pdfborder=0
 ]{hyperref}
 
 \usepackage{mathtools}
@@ -83,7 +83,7 @@
 
 
 
-\title{A Summar of \\Fast Convergence of Regularized Learning in Games~\cite[]{2015arXiv150700407S}}
+\title{A Summary of \\Fast Convergence of Regularized Learning in Games~\cite[]{2015arXiv150700407S}}
 \author{Malte Schledjewski}
 %\renewcommand{\baselinestretch}{1.1}
 \linespread{1.0}
@@ -137,7 +137,7 @@ utility he would have gained in this round.
 The (expected) utility gained by the player in this round is therefore simply the
 inner product $\dotp{ \vec{\mst}_i^t}{\vec{u}_i^t}$.
 The observation of $\vec{u}_i^t$ makes the game quite generous in a sense because it gives a lot
-of information. In a real world scenario like an auction you would
+of information. In a real world scenario, like an auction, you would
 probably only get to know the played strategies of all the players.
 
 After $T$ time steps each player has regret 
@@ -145,11 +145,11 @@ After $T$ time steps each player has regret
 r_i(T)
 = \sup_{\vec{w}_i^*\in \Delta(S_i)} \sum_{t=1}^{T} \dotp{\vec{w}_i^*-\vec{w}_i^t}{ \vec{u}_i^t}. 
 \end{equation*}
-which is equal to the maximum gain he could have achieved by
+which is defined as the maximum gain he could have achieved by
 switching to any other fixed mixed strategy $\vec{w}_i^*$.
 An algorithm for choosing the mixed strategy is called a no-regret algorithm if it has vanishing
 regret which means $r_i(T) = o(T)$ and therefore the regret averaged
-over all round converges to 0.
+over all rounds converges to 0.
 In the paper it is assumed that all players use a no-regret algorithm.
 This constraint is not that tight because no-regret algorithms are a
 natural choice because they have a regret convergence rate of $O(1/\sqrt{T})$ even
@@ -174,7 +174,7 @@ This connection will appear in the two studied algorithms.
 \label{sec:two-no-regret}
 
 The paper takes a closer look at two well-known algorithms.
-Even the optimistic versions exist at least since 2013.
+Even the optimistic versions exist since 2012~\cite{OMD}.
 
 \subsubsection{Optimistic Follow the Regularized Leader}
 \label{sec:optim-foll-regul}
@@ -189,9 +189,9 @@ This idea has a problem because it is unstable.
 There is a simple example sequence which alternates and Follow the
 Leader lags behind one step and therefore predicts exactly the
 opposite~\cite[p.127, Example 2.2]{Foundations}.
-To make the system stable one introduces a so called regularizer.
-Instead of simply maximising the utility up through now one adds a
-penalty term based on the regularizer which punishes \enquote{complex}
+So called regularizers are introduced to make the system stable.
+A penalty term based on a regularizer is added to the
+maximisation term to punish \enquote{complex}
 mixed strategies~\cite[p.89]{schoelkopf2002learning}.
 This adapted version is then called Follow the Regularized Leader.
 There are many different regularizers, one being the entropic
@@ -200,10 +200,10 @@ Regularizers are also known in typical machine learning scenarios to
 prevent the system from learning the noise in the training data.
 They are often used to enforce sparsity in the result.
 
-Optimitstic Follow the Regularized Leader (OFTRL) simply tries to predict the
+Optimistic Follow the Regularized Leader~(OFTRL)~\cite{OMD} simply tries to predict the
 expected utility vector $\vec{u}_i^{t+1}$ for the next round by using
 an adaptive prediction sequence.
-The maximization is not only over all previous rounds but also the
+The maximisation term now also contains the
 predicted next round.
 OFTRL is defined by the choice of the regularizer, the adaptive
 prediction sequence and the so called stepsize $\eta$ which determines how
@@ -264,12 +264,12 @@ algorithms:
   $\alpha > 0$ and $0 < \beta \leq \gamma$ and a pair of dual norms
   $(\|\cdot\|, \|\cdot\|_*)$  if its regret on any sequence of utilities
   $\vec{u}^1, \vec{u}^2, \ldots, \vec{u}^T$ is bounded as
-  \begin{equation}
+  \begin{equation*}
     \sum_{t=1}^{T} \dotp{\vec{w}^*- \vec{w}^t}{\vec{u}^t} \leq \alpha
     +\beta \sum_{t=1}^{T} \| \vec{u}^t - \vec{u}^{t-1}\|_*^2 -
     \gamma\sum_{t=1}^{T} \|\vec{w}^{t} - \vec{w}^{t-1}\|^2.
     \label{eqn:reg-form}
-  \end{equation}  
+  \end{equation*}  
   \label{defn:alg-class}
 \end{defn}
 
@@ -281,31 +281,31 @@ The paper uses the \myprop~property only with
  $\|\cdot\|$ being any norm equivalent to the
  $\ell_1$ norm.
  The dual to the $\ell_1$ norm is the max norm.
- For a player $i$ the equation becomes:
+ For a player $i$ the inequality becomes:
 
- 		\begin{equation*}
-		r(T) \leq \alpha
-		+\beta \sum_{t=1}^{T} \max_{x \in S_i} \left| u_{i,x}^t - u_{i,x}^{t-1} \right|_1^2 -
-		\gamma\sum_{t=1}^{T} \left\|\vec{w}_i^{t} - \vec{w}_i^{t-1}\right\|^2_1
-		\end{equation*}  
+ \begin{equation*}
+   r(T) \leq \alpha
+   +\beta \sum_{t=1}^{T} \max_{x \in S_i} \left| u_{i,x}^t - u_{i,x}^{t-1} \right|_1^2 -
+   \gamma\sum_{t=1}^{T} \left\|\vec{w}_i^{t} - \vec{w}_i^{t-1}\right\|^2_1
+ \end{equation*}  
 
-At this point it should be stressed that $\alpha$,$\beta$ and $\gamma$
+At this point it should be stressed that $\alpha$, $\beta$ and $\gamma$
 are terms and in general not constants.
 $\alpha = O(1)$ is assumed for the rest of the paper.
-The middle term sums up the maximal change of expected utility for a
-possible strategy.
+The middle term accumulates the maximal change in expected utility for
+all possible strategies.
 This term is therefore small if the environment is stable so that
 utilities do not change a lot.
 In case of rapidly changing expected utilities it is possible to
-compensate this by the third term which expresses the change in the
+compensate this large term by the third term, which expresses the change in the
 played mixed strategy.
-The intuition is that if the utilities change a lot it makes sense to
-change the mixed strategy a lot.
+The intuition is that if the utilities change a lot, it makes sense to
+alter  the mixed strategy a lot.
 But in general the change of the played mixed strategy should rather
 be small because on the one hand it is possible to bound the regret in
 terms of change of the played mixed strategy~\cite[p.151, Lemma
 7]{Stanford}
-and on the other hand if all players use similar algorithms then the
+and on the other hand if all players use similar algorithms, then the
 change of expected utilities is influenced by all other players'
 change of their played mixed strategy.
 
@@ -313,14 +313,14 @@ change of their played mixed strategy.
 \subsection{The Algorithms with Recency Bias}
 \label{sec:algor-with-recency}
 
-They show that using recency bias for the prediction in both
+The paper shows that using recency bias for the prediction in both
 algorithms leads to fulfilment of the \myprop~property.
-They show it for two adaptive prediction sequences:
-$H$-step recency bias where the average of the last $H$ observed
-utility vectors is used as the prediction and for geometrically
+Two adaptive prediction sequences are analysed:
+$H$-step recency bias, where the average of the last $H$ observed
+utility vectors is used as the prediction, and geometrically
 discounted recency bias.
 
-The intuition is that over time the player learn to play the game so
+The intuition is that over time the player learn to play the game, so
 it makes sense to use recent behaviour as a guideline and to ignore the
 behaviour that was shown in the beginning where no player knew how to
 play the game.
@@ -330,7 +330,7 @@ So now that we have this new class of algorithms what happens if all
 players use an algorithm from this class?
 
 \subsection{Social Welfare}
-Social welfare is the total utility summed up over all players.
+Social welfare is the accumulated utility summed up over all players.
 The paper only explores social welfare in smooth games as defined by
 \citeauthor{Roughgarden:2009:IRP:1536414.1536485} in~\cite{Roughgarden:2009:IRP:1536414.1536485}.
 Examples for smooth games are second-price auctions and congestion
@@ -338,14 +338,14 @@ games.
 \citeauthor{Roughgarden:2009:IRP:1536414.1536485} basically showed
 that in smooth games the social welfare converges to an approximate
 optimum.
-This convergences is driven by the sum of all players regret.
+This convergences is driven by the sum of all players' regret.
 It is therefore sufficient to show that this sum is constant bounded
 to achieve a convergence rate of $O(1/T)$ due to averaging over all
 time steps.
 
 The paper uses the following theorem which does not depend on all
-players using the same algorithm but on all used algorithms having the
-same parameters $\alpha$,$\beta$ and $\gamma$:
+players using the same algorithm but only on all used algorithms having the
+same parameters $\alpha$, $\beta$ and $\gamma$:
 
 \begin{theorem}\label{thm:sufficient}
 Suppose that the algorithm of each player $i$ satisfies the property
@@ -373,7 +373,7 @@ Social welfare only says something about the average regret.
 All players use no-regret algorithms so their regret growth sublinear.
 Still the regret convergence rate could vary dramatically.
 
-By also requiring all algorithm to be stable one can show that the
+By also requiring all algorithm to be stable, one can show that the
 individual regret is in $O(T^{1/4})$ and the convergence rate
 therefore $O(T^{-3/4})$.
 The paper shows the following theorem:
@@ -388,7 +388,7 @@ $\sum_{t=1}^{T} \dotp{\vec{\mst}_i^*-\vec{\mst}_i^t}{ \vec{u}_i^t}\leq
 \end{theorem}
 
 The proof is similar to the one for social welfare.
-Together with their results for OFTRL with one-step recency they get
+Together with their results concerning the \myprop~property parameters for OFTRL with one-step recency they get:
 
 \begin{corollary}\label{cor:oftrl-bound}
 If all players use the OFTRL algorithm with $\vec{M}_i^t =
@@ -408,7 +408,7 @@ So far the paper has shown that for this scenario of suitable
 algorithms from the \myprop~class the convergence rates of all players'
 regret and the individual regret can be improved.
 But what happens if the environment becomes adversarial?
-Do the algorithms fall back to the rate of $O(1/T)$ which is optimal
+Do the algorithms fall back to the rate of $O(1/T)$, which is optimal
 in this case?
 
 A parametric version of the \myprop~poperty is introduced to  achieve
@@ -420,32 +420,33 @@ guarantees under any conditions:
   property with parameters $\alpha, \beta, \gamma > 0$ and a pair of
   dual norms $(\|\cdot\|, \|\cdot\|_*)$ if its regret on any sequence
   of utilities $\vec{u}^1, \vec{u}^2, \ldots, \vec{u}^T$ is bounded
-  as \begin{equation} \sum_{t=1}^{T} \dotp{\vec{w}^*- \vec{w}^t}{\vec{u}^t} \leq \frac{\alpha}{\knob}
+  as \begin{equation*} \sum_{t=1}^{T} \dotp{\vec{w}^*- \vec{w}^t}{\vec{u}^t} \leq \frac{\alpha}{\knob}
   +\knob\beta \sum_{t=1}^{T} \| \vec{u}^t - \vec{u}^{t-1}\|_*^2
   - \frac{\gamma}{\knob}\sum_{t=1}^{T} \|\vec{w}^{t}
-  - \vec{w}^{t-1}\|^2.  \label{eqn:reg-form-param} \end{equation} \label{defn:alg-class-param}
+  - \vec{w}^{t-1}\|^2.  \label{eqn:reg-form-param} \end{equation*} \label{defn:alg-class-param}
 \end{defn}
 
 For OMD and OFTRL $ \knob = \eta$.
 
 Their black-box reduction uses such a tunable algorithm and employs
-the doubling trick (compare \cite[p.130]{Foundations} for the doubling
-trick based on time-based epochs) based on the accumulated change in
-expected utilities.
+the doubling trick based on the accumulated change in
+expected utilities (compare \cite[p.130]{Foundations} for the doubling
+trick based on time-based epochs).
 
-The base algorithm is played with an initial parameter for all rounds
-until the accumulated change of expected utilities (the sum in the
-middle term of the \myprop~property) reaches a threshold starting at
-1.
-Once this threshold is reached the epoch ends and the parameter is
-adapted and used as input for the next epoch. For each epoch the
-threshold is doubled.
+The black-box reduction works in epochs and uses such a tunable
+algorithm as a base algorithm.
+During one epoch, the same parameter is used as input for the base
+algorithm to play the rounds.
+An epoch ends if the accumulated change in expected utilities (the sum in the
+middle term of the \myprop~property) reaches a certain threshold.
+This threshold starts at one and is doubled each time an epoch ends.
+The used parameter is adjusted for each new epoch.
 
-Due to this doubling there are at most $log(T)$ many epochs and for
+Due to the threshold being doubled for each epoch there are at most $log(T)$ many epochs and for
 each epoch there is the regret bound based on the
 \myprop(\knob)~property.
 This black-box reduction preserves the \myprop~property and also
-guarantees $\tilde{O}(\sqrt{T})$ against any environment for a
+guarantees a regret in $\tilde{O}(\sqrt{T})$ against any environment for a
 suitable initial parameter.
 The results for individual regret are also preserved with the stability
 condition becoming $\|\vec{\mst}_i^t-\vec{\mst}_i^{t-1}\| \leq \stable\knob$.
@@ -466,7 +467,7 @@ The stability which was also a key point concerning the
 \myprop~property and the convergence of individual regret can also be
 seen in \autoref{fig:bids} for the optimistic version.
 
-\begin{figure}[]
+\begin{figure}[p]
 \centering
 \subfigure{
 \includegraphics[width=0.4\textwidth,height=0.3\textwidth]{sum_regret.pdf}
@@ -481,7 +482,7 @@ seen in \autoref{fig:bids} for the optimistic version.
 
 
 
-\begin{figure}[]
+\begin{figure}[p]
 \centering
 \subfigure{
 \includegraphics[width=0.4\textwidth,height=0.3\textwidth]{expected_bid.pdf}
@@ -499,16 +500,14 @@ seen in \autoref{fig:bids} for the optimistic version.
 \section{Conclusion}
 
 This paper introduced the \myprop~property and showed that it is
-sufficient to show that all players' regret converges at the rate of
+sufficient for showing that all players' regret converges at the rate of
 $O(1/T)$ if all used algorithms hold this property for some suitable common
 parameters.
-In smooth games these even implies convergences towards an approximate
+In smooth games this even implies convergences towards an approximate
 optimum of social welfare.
-
 This property is also enough to show each player regret converges at
 the rate of $T^{-3/4}$ if all used algorithms have again suitable
 common parameters and fulfil the stability condition.
-
 Both these rates are improvements over $O(1/\sqrt{T})$.
 
 The black-box reduction can preserve these rates under good conditions
@@ -516,7 +515,7 @@ for all tunable algorithms that satisfy the \myprop(\knob)~property
 while also giving good guarantees in adversarial environments.
 
 These results are also based on a more general game model than the
-two-player zero-sum games making it much more applicable.
+two-player zero-sum games, making it much more applicable.
 
 Recency bias was identified to be sufficient to make the two
 well-known algorithms OMD and OFTRL satisfy these properties.
@@ -525,9 +524,9 @@ The \myprop~property is apparently only sufficient but not needed to
 achieve faster rates.
 The most interesting question is probably whether the rates can still
 be improved over $O(1/\sqrt{T})$ if the players do not gain so much
-information
-but for example only the played strategies of all other players, for
-this would match the information available in real scenarios more closely.
+information.
+What happens when only the played strategies of all other players can
+be observed? This would match the information available in real scenarios more closely.
 
 
 \clearpage
