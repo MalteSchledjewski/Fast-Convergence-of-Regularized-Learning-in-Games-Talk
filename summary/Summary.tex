@@ -193,7 +193,7 @@ The Follow the Leader algorithm simply uses this mixed strategy, which was optim
 the next round.
 
 This idea has a problem because it is unstable.
-There is a simple example sequence which alternates and Follow the
+There is a simple example sequence which alternates and for which Follow the
 Leader lags behind one step and therefore predicts exactly the
 opposite~\cite[p.127, Example 2.2]{Foundations}.
 So called regularizers are introduced to make the system stable.
@@ -310,7 +310,7 @@ The paper uses the \myprop~property only with
  \end{equation*}  
 
 At this point it should be stressed that $\alpha$, $\beta$ and $\gamma$
-are terms and in general not constants.
+are terms that might depend on $T$.
 $\alpha = O(1)$ is assumed for the rest of the paper.
 The middle term accumulates the maximal change in expected utility for
 all possible strategies.
@@ -342,11 +342,11 @@ discounted recency bias.
 
 The intuition is that over time the players learn to play the game, so
 it makes sense to use recent behaviour as a guideline and to ignore the
-behaviour that was shown in the beginning where no player knew how to
+behaviour that was shown in the beginning when no player knew how to
 play the game.
 
 \section{Social Welfare and Individual Regret}
-So now that we have this new class of algorithms what happens if all
+So now that we have this new class of algorithms, what happens if all
 players use an algorithm from this class?
 
 \subsection{Social Welfare}
@@ -363,8 +363,8 @@ It is therefore sufficient to show that this sum is in $O(1)$
 to achieve a convergence rate of $O(1/T)$ due to averaging over all
 time steps.
 
-The paper uses the following theorem which does not depend on all
-players using the same algorithm but only on all used algorithms having the
+The paper uses the following theorem which does not assume that all
+players use the same algorithm but only on all used algorithms having the
 same parameters $\alpha$, $\beta$ and $\gamma$:
 
 \begin{theorem}\label{thm:sufficient}
@@ -389,7 +389,7 @@ It is nice to know that the social welfare reaches an approximate
 optimum in smooth games when all players use algorithms that satisfy
 the \myprop~property with suitable parameters but what about the
 individual results?
-Social welfare only says something about the average regret.
+Social welfare only gives information about the average regret.
 All players use no-regret algorithms so their regret grows sublinear.
 Still the regret convergence rate could vary dramatically.
 
@@ -463,7 +463,7 @@ middle term of the \myprop~property) reaches a certain threshold.
 This threshold starts at one and is doubled each time an epoch ends.
 The used parameter is adjusted for each new epoch.
 
-Due to the threshold being doubled for each epoch there are at most $log(T)$ many epochs and for
+Due to the threshold being doubled for each epoch there are at most $\log(T)$ many epochs and for
 each epoch there is the regret bound based on the
 \myprop(\knob)~property.
 This black-box reduction preserves the \myprop~property and also
