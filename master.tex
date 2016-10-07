@@ -198,7 +198,7 @@
 	 \pause
 	\begin{block}{Idea: randomness}
 		Instead of picking one expert just give the probabilities of choosing the experts.\\
-		The adversary is not allowed to know the draw.\\
+		The adversary is not allowed to know the random draw.\\
 		We then try to minimize accumulated expected loss.
 	\end{block}	
 \end{frame}
@@ -220,7 +220,7 @@
 		\end{block}
 
 \pause[3]
-	\begin{block}{Follow the Regularized Leader \only<4>{\textcolor{red}{with entropic regularizer}}}
+	\begin{block}{Follow the Regularized Leader \only<4>{\textcolor{lightgray}{with entropic regularizer}}}
 	\begin{equation*}
 	w_T
 	= \argmin_{w \in \Delta}  \left(\sum_{t=1}^{T-1} f_t(w) \right) + \frac{1}{\eta}  \only<3>{\inserteqstrut{\mR(w)}} \only<4>{\inserteqstrut{\sum_{i=1}^{d} w_i log(w_i)}}
@@ -327,7 +327,7 @@
 \begin{frame}
 	\frametitle{\myprop~ property}
 	\begin{block}{\myprop~ -- Regret bounded by Variation in Utilities}
-		A vanishing regret algorithm has the \myprop~ property with parameters $\alpha>0$ and $0<\beta\leq\gamma$  if for any sequence of utilities $\vec{u}^1, \vec{u}^2, \ldots, \vec{u}^T$ the regret is bounded as 
+		A no-regret algorithm has the \myprop~ property with parameters $\alpha>0$ and $0<\beta\leq\gamma$  if for any sequence of utilities $\vec{u}^1, \vec{u}^2, \ldots, \vec{u}^T$ the regret is bounded as 
 		\begin{equation*}
 		r(T) \leq \alpha
 		+\beta \sum_{t=1}^{T} \max_{x \in S_i} \left| u_{i,x}^t - u_{i,x}^{t-1} \right|_1^2 -
@@ -344,7 +344,7 @@
 	
 	\begin{block}{Fast convergence of all players' average regret}
 		Suppose that the algorithm of each player $i$ satisfies the \myprop~property
-		with parameters $\alpha, \beta$ and $\gamma$ such that \textcolor{olive}{
+		with parameters $\alpha, \beta$ and $\gamma$ such that \textcolor{purple}{
 		$\beta\leq \gamma/(n-1)^2$}. \\
 		Then $\sum_{i\in N} r_i(T) \leq \alpha n$ and therefore all players' average regret converges at a rate of $O(1/T)$.
 	\end{block}
@@ -371,8 +371,8 @@
 	   \onslide<3->{=&\max_{x \in S_i} \left| \sum_{\tilde{s} \in \vec{s}_{-i}} u_i(x,\tilde{s}) \left( \text{Prob}^t(\tilde{s}) - \text{Prob}^{t-1}(\tilde{s})\right)   \right|\\}
 	   \onslide<4->{\leq&\max_{x \in S_i} \sum_{\tilde{s} \in \vec{s}_{-i}} u_i(x,\tilde{s})  \left| ( \text{Prob}^t(\tilde{s}) - \text{Prob}^{t-1}(\tilde{s}))   \right|\\}
 	   \onslide<5->{\leq& \sum_{\tilde{s} \in \vec{s}_{-i}} \left| \prod_{j\neq i} \mst_{j,\tilde{s}_j}^t - \prod_{j\neq i}\mst_{j,\tilde{s}_j}^{t-1}\right| }
-	   \onslide<6->{\leq \sum_{j\neq i} \|
-	   \vec{\mst}_j^t-\vec{\mst}_j^{t-1}\|}\\
+	   \onslide<6->{\leq \sum_{j\neq i} \left\|
+	   \vec{\mst}_j^t-\vec{\mst}_j^{t-1}\right\|_1}\\
 		\onslide<7->{\Rightarrow &\textcolor{red}{\sum_{i\in N} \max_{x \in S_i} \left| u_{i,x}^t - u_{i,x}^{t-1} \right|^2}
 		\leq (n-1)^2 \textcolor{blue}{\sum_{i\in N} \left\| \vec{\mst}_i^t-
 		\vec{\mst}_i^{t-1}\right\|^2_1}}
